@@ -63,4 +63,52 @@ class Tree(object):
         else:
             return('error')
 
-# Draw tree
+
+from Tkinter import *
+class Application(Frame):
+
+    def say_hi(self):
+        print "Type change"
+
+    def say_add(self):
+        print "Add branch"
+
+    def say_node(self):
+        print "Add node"
+
+    def createWidgets(self):
+        self.w = Canvas(self, width=600, height=600)
+        self.w.pack()
+
+        self.QUIT = Button(self)
+        self.QUIT["text"] = "QUIT"
+        self.QUIT["fg"] = "red"
+        self.QUIT["command"] = self.quit
+        self.QUIT.pack({"side": "left"})
+
+        self.change = Button(self)
+        self.change["text"] = "Change Type"
+        self.change["command"] = self.say_hi
+        self.change.pack({"side": "left"})
+
+        self.add_branch = Button(self)
+        self.add_branch["text"] = "Add Branch"
+        self.add_branch["command"] = self.say_add
+        self.add_branch.pack({"side": "left"})
+
+        self.add_node = Button(self)
+        self.add_node["text"] = "Add Node"
+        self.add_node["command"] = self.say_node
+        self.add_node.pack({"side": "left"})
+
+        self.w.create_line(0,0,600,600)
+
+    def __init__(self, master=None):
+        Frame.__init__(self, master)
+        self.pack()
+        self.createWidgets()
+
+root = Tk()
+app = Application(master=root)
+app.mainloop()
+root.destroy()

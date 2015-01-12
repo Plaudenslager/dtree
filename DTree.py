@@ -18,6 +18,11 @@ Background tasks
 '''
 import uuid
 
+class Parent_ID:
+    def __init__(self, node_ID, branch_number):
+        self.node_ID = node_ID
+        self.branch_number = branch_number
+
 class Node:
     def __init__(self, node_type='D', ID=None):
         if node_type not in ['D','E']: return
@@ -28,33 +33,41 @@ class Node:
             self.ID = str(ID).strip().lower().replace(" ","")
 
         self.branches = []
-        self.__parent = None
+        self.__parent_ID = None
         self.node_type = node_type
 
-    def add_branch(self, name=None, cashflow=0, probability=0):
-        if name==None:
-            name = self.node_type+str(len(self.branches))
-        branch = dict(name=name, cashflow=cashflow, backsolve=0, probability=probability, child=None)
+    def add_branch(self, description=None, cashflow=0, probability=0):
+        if description==None:
+            description = self.node_type+str(len(self.branches))
+        branch = dict(description=description, cashflow=cashflow, backsolve=0, probability=probability, child=None)
         self.branches.append(branch)
 
     def del_branch(self, branch_number):
         del self.branches[branch_number]
 
+    def get_child(self, branch_number):
+        return self.branches[branch_number]['child']
+
+    def set_child(self, branch_number, child_node):
+        self.branches[branch_number]['child'] = child_node
+
     @property
     def parent(self):
-        return self.__parent
+        return self.__parent_ID
 
     @parent.setter
     def parent(self, parent_node_ID, branch_number):
-        self.__parent = (parent_node_ID, branch_number)
+        self.__parent_ID = Parent_ID(parent_node_ID, branch_number)
 
     @property
     def width(self):
         total_width = len(self.branches)
         for current_branch in self.branches:
             if current_branch['child'] is not None:
-                branch_width = self.width(current_branch)
-                current_branch = current_branch - 1 + branch_width
+                child = current_branch['child']
+                branch_width = child.width
+                if branch_width > 0:
+                    total_width = total_width - 1 + branch_width
         return total_width
 
     @property
@@ -65,14 +78,30 @@ class Node:
     def backsolve(self, branch_number, value):
         self.branches[branch_number]['backsolve'] = value
 
-    def get_branch_number(self, branch_name):
-        if branch_name in self.branches:
-            return self.branches.index(branch_name)
-        else:
-            return None
+    def branch_number(self, branch_name):
+        a = [item['description'] for item in self.branches]
+        return a.index(branch_name)
 
 
-class Tree(object):
+class Tree():
+    def __init__(self):
+        self.nodes = []
+
+    def node_index(self, node_ID):
+        for node in self.nodes:
+            if node.ID == node_ID:
+                return self.nodes.find(node)
+
+    def add_node(self):
+
+
+    def add_branch(self):
+
+
+
+
+
+class Old_Tree(object):
     def __init__(self, node_type='D'):
         # Types are: Decision, Event (first initial only)
         # Data structure:
@@ -126,6 +155,26 @@ class Tree(object):
         while len(self.data) > current_branch:
             if 'child' in self.data[current_branch]:
                 child_width = self.width
+
+class Edge():
+    '''
+    Treat the edges of the decision tree as the nodes.
+    Decision and Event nodes contain data, plus the node type for the child node
+    Root node is special type that contains only backsolve and child node type
+    '''
+
+    def __init__(self, parent_ID, node_type, description, cashflow, probability=None):
+        self.parent_ID = parent_ID
+        self.node_type = node_type
+        self.description = description
+        self.cashflow = cashflow
+        self.probability = probability
+        self.child_ID = None
+        self.backsolve = 0
+        self.solve = 0
+
+
+
 
 from Tkinter import *
 class Application(Frame):

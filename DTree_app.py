@@ -52,9 +52,7 @@ print 'width: %d' % tree.width()
 print 'depth: %d' % tree.depth()
 
 print "\nDelete everything under the root node"
-while tree[0].width > 0:
-    print tree[0].width
-    tree.del_branch(0)
+tree.set_node(0,'D',3)
 
 tree.display()
 print 'width: %d' % tree.width()

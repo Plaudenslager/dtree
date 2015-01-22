@@ -118,16 +118,16 @@ class Tree():
     def set_node(self, node_ID, node_type, branches, warn=True):
         if node_ID not in self.nodes:
             return
-        clear_node(node_ID)
+        self.clear_node(node_ID)
         node = self[node_ID]
+        p = 1.0/branches
         while branches > 0:
-            self.add_branch(node_ID,probability=1.0/branches)
+            self.add_branch(node_ID,probability=p)
             branches -= 1
 
     def clear_node(self, node_ID):
         while self[node_ID].width >0:
             self.del_branch(node_ID)
-
 
     def add_node(self, parent_ID, node_type='D', ID=None, branches=2):
         if self[parent_ID.node_ID][parent_ID.branch_number]['child'] is not None:

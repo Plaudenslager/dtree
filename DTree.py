@@ -96,17 +96,18 @@ class Node:
     def width(self):
         return len(self.branches)
 
-    @property
-    def backsolve(self, branch_number):
-        return self.branches[branch_number]['backsolve']
-
-    @backsolve.setter
-    def backsolve(self, branch_number, value):
-        self.branches[branch_number]['backsolve'] = value
+    def update_backsolve(self, branch_number, value):
+        if self.node_type == 'E':
+            self.branches[branch_number]['backsolve'] = value * self.branches[branch_number]['probability']
+        else:
+            self.branches[branch_number]['backsolve'] = value
 
     def branch_number(self, branch_name):
         a = [item['description'] for item in self.branches]
         return a.index(branch_name)
+
+    def __getitem__(self, item):
+        return self.branches[item]
 
 
 class Tree():
@@ -189,22 +190,17 @@ class Tree():
 
     def __forward_solve(self, node_ID=0, cashflow=0):
         if self[node_ID].width > 0:
-            for branch in self[node_ID].branches:
+            for index, branch in enumerate(self[node_ID].branches):
                 cashflow += branch['cashflow']
                 if branch['child'] is not None:
-                    leaf_backsolve = self.__forward_solve(branch['child'],cashflow)
-                    if self[node_ID].node_type == 'E':
-
+                    backsolve = self.__forward_solve(branch['child'], cashflow)
                 else:
                     branch['t_value'] = cashflow
-                    if self[node_ID].node_type == 'E':
-                        branch['backsolve'] = cashflow * branch['probability']
-                    else:
-                        branch['backsolve'] = cashflow
-            if self[node_ID].node_type == 'E':
-                # sum expected values of all branches
-            else:
-                # choose highest value decision
+                    backsolve = branch['t_value']
+
+                self[node_ID].update_backsolve(index, backsolve)
+
+            return self[node_ID].node_value
 
     def __update_parent(self, parent_ID, child_node_ID):
         self[parent_ID.node_ID].branches[parent_ID.branch_number]['child'] = child_node_ID

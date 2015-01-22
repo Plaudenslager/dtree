@@ -134,10 +134,10 @@ class Tree():
             for branch in self[node_ID].branches:
                 #print "\t"*level, branch
                 if branch['child'] == None:
-                    print "\t"*level,"%s" %branch['description']
+                    print "\t"*level,"%s ---------->" %branch['description']
                 else:
                     print "\t"*level,"%s\t%s:%s" %(branch['description'],self[branch['child']].node_type, branch['child'])
-                    self.display(branch['child'],level)
+                    self.display(branch['child'],level+1)
 
     def __update_parent(self, parent_ID, child_node_ID):
         self[parent_ID.node_ID].branches[parent_ID.branch_number]['child'] = child_node_ID

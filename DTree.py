@@ -28,7 +28,7 @@ class Node:
         if node_type not in ['D','E']: return
 
         if ID == None:
-            self.ID = str(uuid.uuid1())
+            self.ID = str(uuid.uuid1()).split("-")[3]
         else:
             self.ID = str(ID).strip().lower().replace(" ","")
 
@@ -45,11 +45,13 @@ class Node:
     def del_branch(self, branch_number):
         del self.branches[branch_number]
 
-    def get_child(self, branch_number):
+    @property
+    def child(self, branch_number):
         return self.branches[branch_number]['child']
 
-    def set_child(self, branch_number, child_node):
-        self.branches[branch_number]['child'] = child_node
+    @child.setter
+    def child(self, branch_number, value):
+        self.branches[branch_number]['child'] = value
 
     @property
     def parent(self):
@@ -61,14 +63,7 @@ class Node:
 
     @property
     def width(self):
-        total_width = len(self.branches)
-        for current_branch in self.branches:
-            if current_branch['child'] is not None:
-                child = current_branch['child']
-                branch_width = child.width
-                if branch_width > 0:
-                    total_width = total_width - 1 + branch_width
-        return total_width
+        return len(self.branches)
 
     @property
     def backsolve(self, branch_number):
@@ -85,17 +80,72 @@ class Node:
 
 class Tree():
     def __init__(self):
-        self.nodes = []
+        # K,V in nodes dictionary is ID, node object
+        self.nodes = dict()
 
-    def node_index(self, node_ID):
-        for node in self.nodes:
-            if node.ID == node_ID:
-                return self.nodes.find(node)
+        # Create root node
+        root = Node(ID=0)
+        self.nodes[0] = root
 
-    def add_node(self):
+    def add_node(self, parent_ID, node_type='D', ID=None):
+        node = Node(node_type,ID)
+        node.parent = parent_ID
+        self.__update_parent(parent_ID,node.ID)
+        self.nodes[node.ID] = node
+        return node.ID
+
+    def del_node(self, node_ID):
+        parent = self[node_ID].parent
+        self[parent.node_ID].branches[parent.branch_number]['child'] = None
+        self[node_ID].delete()
+
+    def add_branch(self, node_ID, description=None, cashflow=0, probability=0):
+        node = self[node_ID]
+        node.add_branch(description=description, cashflow=cashflow, probability=probability)
+
+    def del_branch(self, node_ID, branch_number):
+        if branch_number > self[node_ID].width+1:
+            return
+        else:
+            branch = self[node_ID].branches[branch_number]
+            if branch['child'] is not None:
+                self.del_node(branch['child'])
+            self[node_ID].del_branch(branch_number)
 
 
-    def add_branch(self):
+    def width(self, node_ID=0):
+        # get width of current node
+        # iterate through any branches
+        # get any child node for the current branch, recurse
+        total_width = self[node_ID].width
+        if total_width > 0:
+            for branch in self[node_ID].branches:
+                if branch['child'] is not None:
+                    child_width = self.width(branch['child'])
+                    total_width += child_width -1
+        return max(total_width,1)
+
+    def display(self,node_ID=0,level=0):
+        if node_ID == 0:
+            print "%s:%s" %(self[node_ID].node_type,node_ID)
+        if self[node_ID].width > 0:
+            level += 1
+            for branch in self[node_ID].branches:
+                #print "\t"*level, branch
+                if branch['child'] == None:
+                    print "\t"*level,"%s" %branch['description']
+                else:
+                    print "\t"*level,"%s\t%s:%s" %(branch['description'],self[branch['child']].node_type, branch['child'])
+                    self.display(branch['child'],level)
+
+    def __update_parent(self, parent_ID, child_node_ID):
+        self[parent_ID.node_ID].branches[parent_ID.branch_number]['child'] = child_node_ID
+
+    def __getitem__(self, item):
+        return self.nodes[item]
+
+
+
 
 
 

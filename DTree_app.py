@@ -1,82 +1,56 @@
 __author__ = 'peter'
 
-from DTree import Node
+from DTree import *
+import random
 
-# Create root node
-root = Node('D')
+def print_tree():
+    print'Nodes in tree'
+    print'ID:\tType\tbranches'
+    for k,v in tree.nodes.iteritems():
+        print '%d:\t%s' %(k,v.node_type,)
+    print 80*'=','\n'
 
-# Add some branches
+print "Create tree and root node"
+tree = Tree()
+#print_tree()
+tree.display()
+
+print "\nAdd some branches"
 for i in range(0,6):
-    root.add_branch()
+    tree.nodes[0].add_branch()
+tree.display()
 
-# Calculate width of tree
-print 'width: %d' % root.width
+print "\nCalculate width of tree"
+print 'width: %d' % tree.width()
 
-# Print branch numbers and names
-print
-print 'branch','name','child'
-for branch in root.branches:
-    b_name = branch['description']
-    number = root.branch_number(b_name)
-    c = branch['child']
-    print (number, b_name, c)
+print "\nDelete a branch"
+tree.del_branch(0,3)
+tree.display()
+print 'width: %d' % tree.width()
 
-print '='*20
+print "\nCreate a child node, and add it to a branch"
+tree.add_node(Parent_ID(0,0),'E')
+tree.display()
+print 'width: %d' % tree.width()
 
-# Delete a branch
-root.del_branch(3)
+print "\n list nodes"
+for item in tree.nodes.keys():
+    print item
 
-# Print branch numbers and names
-print
-print 'branch','name','child'
-for branch in root.branches:
-    b_name = branch['description']
-    number = root.branch_number(b_name)
-    c = branch['child']
-    print (number, b_name, c)
+print "\nCreate many more child nodes, add branches"
+for i in range(0,10):
+    node = random.choice(tree.nodes.keys())
+    if len(tree[node].branches) < 3:
+        tree.add_branch(node)
+        print '-created branch on node %s' %node
+    else:
+        branch = random.choice(range(len(tree[node].branches)))
+        new_node = tree.add_node(Parent_ID(node,branch),random.choice(['E','D']))
+        print '+created new node %s on branch %d of node %s' %(new_node,branch,node)
 
-# Calculate width of tree
-print 'width: %d' % root.width
+tree.display()
+print 'width: %d' % tree.width()
 
-# Create a child node, and add it to a branch
-child = Node('E')
-root.set_child(1,child)
-print child.ID
-print root.branches[1]['child'].ID
-
-print '='*20
-
-# Print branch numbers and names
-print
-print 'branch','name','child'
-for branch in root.branches:
-    b_name = branch['description']
-    number = root.branch_number(b_name)
-    c = branch['child']
-    print (number, b_name, c)
-
-# Calculate width of tree
-print 'width: %d' % root.width
-
-# Create a child node, and add it to a branch
-child = Node('E')
-c = root.get_child(1)
-c.add_branch()
-c.add_branch()
-c.set_child(1,child)
-print child.ID
-print c.branches[1]['child'].ID
-
-print '='*20
-
-# Print branch numbers and names
-print
-print 'branch','name','child'
-for branch in root.branches:
-    b_name = branch['description']
-    number = root.branch_number(b_name)
-    c = branch['child']
-    print (number, b_name, c)
-
-# Calculate width of tree
-print 'width: %d' % root.width
+print "\n list nodes"
+for item in tree.nodes.keys():
+    print item

@@ -39,11 +39,19 @@ class Node:
     def add_branch(self, description=None, cashflow=0, probability=0):
         if description==None:
             description = self.node_type+str(len(self.branches))
-        branch = dict(description=description, cashflow=cashflow, backsolve=0, probability=probability, child=None)
+        branch = dict(description=description, cashflow=cashflow, backsolve=0, probability=probability, child=None, t_value=0)
         self.branches.append(branch)
 
     def del_branch(self, branch_number):
         del self.branches[branch_number]
+
+    @property
+    def t_value(self,branch_number):
+        return self.branches[branch_number]['t_value']
+
+    @t_value.setter
+    def t_value(self,branch_number,value):
+        self.branches[branch_number]['t_value'] = value
 
     @property
     def child(self, branch_number):

@@ -87,11 +87,14 @@ class Tree():
         root = Node(ID=0)
         self.nodes[0] = root
 
-    def add_node(self, parent_ID, node_type='D', ID=None):
+    def add_node(self, parent_ID, node_type='D', ID=None, branches=2):
+        branches = max(2,branches)
         node = Node(node_type,ID)
         node.parent = parent_ID
         self.__update_parent(parent_ID,node.ID)
         self.nodes[node.ID] = node
+        for b in range(0, branches):
+            node.add_branch(description=None, cashflow=0, probability=1/branches)
         return node.ID
 
     def del_node(self, node_ID):

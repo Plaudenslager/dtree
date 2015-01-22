@@ -9,6 +9,7 @@ class Parent_ID:
 
 class Node:
     def __init__(self, node_type='D', ID=None):
+        node_type = node_type.upper()
         if node_type not in ['D','E']: return
 
         if ID == None:
@@ -189,11 +190,11 @@ class Tree():
                 #print "\t"*level, branch
                 if branch['child'] == None:
                     spacer_string = "-"*(8*depth-4*level)+">"
-                    print "\t"*level,"%s cf: %d, p: %d, bs: %d %s %d" % (branch['description'], branch['cashflow'],
+                    print "\t"*level,"%s cf: %d, p: %.1f%%, bs: %d %s %d" % (branch['description'], branch['cashflow'],
                                                                    branch['probability']*100, branch['backsolve'],
                                                                    spacer_string, branch['t_value'])
                 else:
-                    print "\t"*level,"%s cf: %d, p: %d, bs: %d\t%s:%s" %(branch['description'],branch['cashflow'],
+                    print "\t"*level,"%s cf: %d, p: %.1f%%, bs: %d\t%s:%s" %(branch['description'],branch['cashflow'],
                                                                          branch['probability']*100, branch['backsolve'],
                                                                          self[branch['child']].node_type, branch['child'])
                     self.display(branch['child'],level+1,depth)
@@ -238,9 +239,17 @@ def InteractiveTreeMain():
     pass
 
 def CommandLoop():
-    cmd = raw_input('Enter D# or E# to >')
+    cmd = None
+    while cmd not in ['D','E']:
+        cmd_string = raw_input('Enter D# or E# to create a new Decision or Event with # branches >')
+        cmd = cmd_string[0].upper()
+        branches = int(cmd_string[1:])
+    tree = Tree()
+    tree.set_node(0,cmd,branches)
+    tree.display()
 
-
+if __name__ == '__main__':
+    CommandLoop()
 
 from Tkinter import *
 class Application(Frame):

@@ -1,21 +1,5 @@
 __author__ = 'peter'
 
-'''
-Structure
-    EdgeDict1(Name, Cashflow, Backsolve, Probability, Child_node)
-    Node(Type, EdgeDict1, EdgeDict2, EdgeDict3)
-    Tree(Node1, Node2, Node3)
-
-Operations
-    Change node type
-    Add branch
-    Delete branch
-
-Background tasks
-    Calculate back solve
-    Calculate terminal
-    Identify best option
-'''
 import uuid
 
 class Parent_ID:
@@ -50,7 +34,6 @@ class Node:
             self.node_type = 'D'
         else:
             self.node_type = 'E'
-
 
     @property
     def best_node(self):
@@ -123,7 +106,6 @@ class Node:
     def __getitem__(self, item):
         return self.branches[item]
 
-
 class Tree():
     def __init__(self):
         # K,V in nodes dictionary is ID, node object
@@ -132,6 +114,20 @@ class Tree():
         # Create root node
         root = Node(ID=0)
         self.nodes[0] = root
+
+    def set_node(self, node_ID, node_type, branches, warn=True):
+        if node_ID not in self.nodes:
+            return
+        clear_node(node_ID)
+        node = self[node_ID]
+        while branches > 0:
+            self.add_branch(node_ID,probability=1.0/branches)
+            branches -= 1
+
+    def clear_node(self, node_ID):
+        while self[node_ID].width >0:
+            self.del_branch(node_ID)
+
 
     def add_node(self, parent_ID, node_type='D', ID=None, branches=2):
         if self[parent_ID.node_ID][parent_ID.branch_number]['child'] is not None:
@@ -149,10 +145,7 @@ class Tree():
         return node.ID
 
     def del_node(self, node_ID):
-        if self[node_ID].width > 0:
-            while self[node_ID].width >0:
-                self.del_branch(node_ID)
-        parent = self[node_ID].parent
+        self.clear_node(node_ID)
         self.__update_parent(node_ID, clear=True)
         del self.nodes[node_ID]
         self.__forward_solve()
@@ -240,7 +233,12 @@ class Tree():
             print "***** WTF tried to get a non-existent node ID: %s", item
         return self.nodes[item]
 
+def InteractiveTreeMain():
+    # provide interactive command line for interacting with a tree
+    pass
 
+def CommandLoop():
+    cmd = raw_input('Enter D# or E# to >')
 
 
 

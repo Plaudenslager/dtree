@@ -133,18 +133,20 @@ class Tree():
                         total_width += child_width -1
         return max(total_width,1)
 
-    def display(self,node_ID=0,level=0):
+    def display(self,node_ID=0,level=0, depth=0):
         if node_ID == 0:
             print "%s:%s" %(self[node_ID].node_type,node_ID)
+            depth = self.depth(0)
         if self[node_ID].width > 0:
             level += 1
             for branch in self[node_ID].branches:
                 #print "\t"*level, branch
                 if branch['child'] == None:
-                    print "\t"*level,"%s ---------->" %branch['description']
+                    spacer_string = "-"*(8*depth-4*level)+">"
+                    print "\t"*level,"%s %s %d" % (branch['description'], spacer_string, branch['t_value'])
                 else:
                     print "\t"*level,"%s\t%s:%s" %(branch['description'],self[branch['child']].node_type, branch['child'])
-                    self.display(branch['child'],level+1)
+                    self.display(branch['child'],level+1,depth)
 
     def depth(self,node_ID=0):
         max_depth = 1

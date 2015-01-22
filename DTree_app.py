@@ -16,7 +16,7 @@ tree.display()
 
 print "\nAdd some branches"
 for i in range(0,6):
-    tree.add_branch(0, cashflow=random.randint(-5000,5000), probability=1/6)
+    tree.add_branch(0, cashflow=i*100, probability=1.0/6)
 tree.display()
 
 print "\nCalculate width of tree"

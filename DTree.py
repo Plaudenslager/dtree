@@ -36,7 +36,7 @@ class Node:
         self.__parent_ID = None
         self.node_type = node_type
 
-    def add_branch(self, description=None, cashflow=0, probability=0):
+    def add_branch(self, description=None, cashflow=0, probability=0.0):
         if description==None:
             description = self.node_type+str(len(self.branches))
         branch = dict(description=description, cashflow=cashflow, backsolve=0, probability=probability, child=None, t_value=0)
@@ -126,7 +126,8 @@ class Tree():
         self.__update_parent(parent_ID,node.ID)
         self.nodes[node.ID] = node
         for b in range(0, branches):
-            node.add_branch(description=None, cashflow=0, probability=1/branches)
+            p = 1.0 / branches
+            node.add_branch(description=None, cashflow=0, probability=p)
         self.__forward_solve()
         return node.ID
 
@@ -139,7 +140,7 @@ class Tree():
         self[node_ID].delete()
         self.__forward_solve()
 
-    def add_branch(self, node_ID, description=None, cashflow=0, probability=0):
+    def add_branch(self, node_ID, description=None, cashflow=0, probability=0.0):
         node = self[node_ID]
         node.add_branch(description=description, cashflow=cashflow, probability=probability)
         self.__forward_solve()
@@ -174,7 +175,9 @@ class Tree():
                 #print "\t"*level, branch
                 if branch['child'] == None:
                     spacer_string = "-"*(8*depth-4*level)+">"
-                    print "\t"*level,"%s %s %d" % (branch['description'], spacer_string, branch['t_value'])
+                    print "\t"*level,"%s cf: %d, p: %d, bs: %d %s %d" % (branch['description'], branch['cashflow'],
+                                                                   branch['probability']*100, branch['backsolve'],
+                                                                   spacer_string, branch['t_value'])
                 else:
                     print "\t"*level,"%s\t%s:%s" %(branch['description'],self[branch['child']].node_type, branch['child'])
                     self.display(branch['child'],level+1,depth)

@@ -103,16 +103,22 @@ class Tree():
         self.nodes[node.ID] = node
         for b in range(0, branches):
             node.add_branch(description=None, cashflow=0, probability=1/branches)
+        self.__forward_solve()
         return node.ID
 
     def del_node(self, node_ID):
+        if self[node_ID].width > 0:
+            for branch_number in range(0,self[node_ID].width):
+                self.del_branch(node_ID,branch_number)
         parent = self[node_ID].parent
         self[parent.node_ID].branches[parent.branch_number]['child'] = None
         self[node_ID].delete()
+        self.__forward_solve()
 
     def add_branch(self, node_ID, description=None, cashflow=0, probability=0):
         node = self[node_ID]
         node.add_branch(description=description, cashflow=cashflow, probability=probability)
+        self.__forward_solve()
 
     def del_branch(self, node_ID, branch_number):
         if branch_number > self[node_ID].width+1:
@@ -122,6 +128,7 @@ class Tree():
             if branch['child'] is not None:
                 self.del_node(branch['child'])
             self[node_ID].del_branch(branch_number)
+            self.__forward_solve()
 
     def width(self, node_ID=0):
         total_width = self[node_ID].width
@@ -157,6 +164,14 @@ class Tree():
                     max_depth = max(max_depth, branch_depth)
         return max_depth
 
+    def __forward_solve(self, node_ID=0, cashflow=0):
+        if self[node_ID].width > 0:
+            for branch in self[node_ID].branches:
+                cashflow += branch['cashflow']
+                if branch['child'] is not None:
+                    self.__forward_solve(branch['child'],cashflow)
+                else:
+                    branch['t_value'] = cashflow
 
     def __update_parent(self, parent_ID, child_node_ID):
         self[parent_ID.node_ID].branches[parent_ID.branch_number]['child'] = child_node_ID

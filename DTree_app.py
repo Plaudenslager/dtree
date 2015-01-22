@@ -12,12 +12,11 @@ def print_tree():
 
 print "Create tree and root node"
 tree = Tree()
-#print_tree()
 tree.display()
 
 print "\nAdd some branches"
 for i in range(0,6):
-    tree.nodes[0].add_branch()
+    tree.add_branch(0, cashflow=random.randint(-5000,5000))
 tree.display()
 
 print "\nCalculate width of tree"
@@ -41,7 +40,7 @@ print "\nCreate many more child nodes, add branches"
 for i in range(0,10):
     node = random.choice(tree.nodes.keys())
     if len(tree[node].branches) < 3:
-        tree.add_branch(node)
+        tree.add_branch(node,cashflow=random.randint(-5000,5000))
         print '-created branch on node %s' %node
     else:
         branch = random.choice(range(len(tree[node].branches)))

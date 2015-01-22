@@ -46,6 +46,29 @@ class Node:
         del self.branches[branch_number]
 
     @property
+    def best_node(self):
+        a = self.node_value()
+        return self._best_node
+
+    @property
+    def node_value(self):
+        if self.node_type == 'E':
+            self.best_node = None
+            p = [b['probability'] for b in self.branches]
+            if sum(p) <> 1:
+                return None
+            else:
+                a = [b['backsolve'] for b in self.branches]
+                return sum(a)
+        else:
+            a = [b['backsolve'] for b in self.branches]
+            max_value = max(a)
+            for index, value in enumerate(a):
+                if value == max_value:
+                    self._best_node = index
+                    return max_value
+
+    @property
     def t_value(self,branch_number):
         return self.branches[branch_number]['t_value']
 
@@ -169,9 +192,19 @@ class Tree():
             for branch in self[node_ID].branches:
                 cashflow += branch['cashflow']
                 if branch['child'] is not None:
-                    self.__forward_solve(branch['child'],cashflow)
+                    leaf_backsolve = self.__forward_solve(branch['child'],cashflow)
+                    if self[node_ID].node_type == 'E':
+
                 else:
                     branch['t_value'] = cashflow
+                    if self[node_ID].node_type == 'E':
+                        branch['backsolve'] = cashflow * branch['probability']
+                    else:
+                        branch['backsolve'] = cashflow
+            if self[node_ID].node_type == 'E':
+                # sum expected values of all branches
+            else:
+                # choose highest value decision
 
     def __update_parent(self, parent_ID, child_node_ID):
         self[parent_ID.node_ID].branches[parent_ID.branch_number]['child'] = child_node_ID

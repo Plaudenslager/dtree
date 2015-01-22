@@ -45,6 +45,8 @@ class Node:
     def del_branch(self, branch_number):
         del self.branches[branch_number]
 
+    #TODO: need a method to change node type
+
     @property
     def best_node(self):
         a = self.node_value()

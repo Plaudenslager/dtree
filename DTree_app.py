@@ -50,7 +50,7 @@ for i in range(0,10):
 
 tree.display()
 print 'width: %d' % tree.width()
-
+print 'depth: %d' % tree.depth()
 print "\n list nodes"
 for item in tree.nodes.keys():
     print item

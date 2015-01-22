@@ -123,11 +123,7 @@ class Tree():
                 self.del_node(branch['child'])
             self[node_ID].del_branch(branch_number)
 
-
     def width(self, node_ID=0):
-        # get width of current node
-        # iterate through any branches
-        # get any child node for the current branch, recurse
         total_width = self[node_ID].width
         if total_width > 0:
             for branch in self[node_ID].branches:
@@ -149,6 +145,16 @@ class Tree():
                 else:
                     print "\t"*level,"%s\t%s:%s" %(branch['description'],self[branch['child']].node_type, branch['child'])
                     self.display(branch['child'],level+1)
+
+    def depth(self,node_ID=0):
+        max_depth = 1
+        if self[node_ID].width > 0:
+            for branch in self[node_ID].branches:
+                if branch['child'] is not None:
+                    branch_depth = self.depth(branch['child']) + 1
+                    max_depth = max(max_depth, branch_depth)
+        return max_depth
+
 
     def __update_parent(self, parent_ID, child_node_ID):
         self[parent_ID.node_ID].branches[parent_ID.branch_number]['child'] = child_node_ID

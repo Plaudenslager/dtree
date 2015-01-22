@@ -59,7 +59,12 @@ class Node:
                 return None
             else:
                 a = [b['backsolve'] for b in self.branches]
-                return sum(a)
+                try:
+                    return sum(a)
+                except:
+                    print "failed to calculate node_value for D:%s, using " % self.ID,
+                    print a
+
         else:
             a = [b['backsolve'] for b in self.branches]
             max_value = max(a)
@@ -120,11 +125,14 @@ class Tree():
         self.nodes[0] = root
 
     def add_node(self, parent_ID, node_type='D', ID=None, branches=2):
+        if self[parent_ID.node_ID][parent_ID.branch_number]['child'] is not None:
+            print "***** WTF tried to add a node where one already exists ******"
+            return
         branches = max(2,branches)
         node = Node(node_type,ID)
         node.parent = parent_ID
-        self.__update_parent(parent_ID,node.ID)
         self.nodes[node.ID] = node
+        self.__update_parent(node.ID)
         for b in range(0, branches):
             p = 1.0 / branches
             node.add_branch(description=None, cashflow=0, probability=p)
@@ -133,11 +141,11 @@ class Tree():
 
     def del_node(self, node_ID):
         if self[node_ID].width > 0:
-            for branch_number in range(0,self[node_ID].width):
-                self.del_branch(node_ID,branch_number)
+            while self[node_ID].width >0:
+                self.del_branch(node_ID,0)
         parent = self[node_ID].parent
-        self[parent.node_ID].branches[parent.branch_number]['child'] = None
-        self[node_ID].delete()
+        self.__update_parent(node_ID, clear=True)
+        del self.nodes[node_ID]
         self.__forward_solve()
 
     def add_branch(self, node_ID, description=None, cashflow=0, probability=0.0):
@@ -146,12 +154,15 @@ class Tree():
         self.__forward_solve()
 
     def del_branch(self, node_ID, branch_number):
-        if branch_number > self[node_ID].width+1:
+        if branch_number > self[node_ID].width-1:
             return
         else:
             branch = self[node_ID].branches[branch_number]
             if branch['child'] is not None:
                 self.del_node(branch['child'])
+                if branch['child'] is not None:
+                    print "********* WTF deleted child node, but is still listed in parent branch *********"
+
             self[node_ID].del_branch(branch_number)
             self.__forward_solve()
 
@@ -207,10 +218,16 @@ class Tree():
 
             return self[node_ID].node_value
 
-    def __update_parent(self, parent_ID, child_node_ID):
-        self[parent_ID.node_ID].branches[parent_ID.branch_number]['child'] = child_node_ID
+    def __update_parent(self, child_node_ID, clear=False):
+        parent_ID = self[child_node_ID].parent
+        if clear:
+            self[parent_ID.node_ID].branches[parent_ID.branch_number]['child'] = None
+        else:
+            self[parent_ID.node_ID].branches[parent_ID.branch_number]['child'] = child_node_ID
 
     def __getitem__(self, item):
+        if item not in self.nodes:
+            print "***** WTF tried to get a non-existent node ID: %s", item
         return self.nodes[item]
 
 

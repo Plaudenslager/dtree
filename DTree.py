@@ -179,7 +179,9 @@ class Tree():
                                                                    branch['probability']*100, branch['backsolve'],
                                                                    spacer_string, branch['t_value'])
                 else:
-                    print "\t"*level,"%s\t%s:%s" %(branch['description'],self[branch['child']].node_type, branch['child'])
+                    print "\t"*level,"%s cf: %d, p: %d, bs: %d\t%s:%s" %(branch['description'],branch['cashflow'],
+                                                                         branch['probability']*100, branch['backsolve'],
+                                                                         self[branch['child']].node_type, branch['child'])
                     self.display(branch['child'],level+1,depth)
 
     def depth(self,node_ID=0):

@@ -122,7 +122,8 @@ class Tree():
             for branch in self[node_ID].branches:
                 if branch['child'] is not None:
                     child_width = self.width(branch['child'])
-                    total_width += child_width -1
+                    if child_width > 0:
+                        total_width += child_width -1
         return max(total_width,1)
 
     def display(self,node_ID=0,level=0):

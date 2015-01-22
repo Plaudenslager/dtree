@@ -16,7 +16,7 @@ tree.display()
 
 print "\nAdd some branches"
 for i in range(0,6):
-    tree.add_branch(0, cashflow=random.randint(-5000,5000))
+    tree.add_branch(0, cashflow=random.randint(-5000,5000), probability=1/6)
 tree.display()
 
 print "\nCalculate width of tree"
@@ -52,4 +52,5 @@ print 'width: %d' % tree.width()
 print 'depth: %d' % tree.depth()
 
 print "\nDelete everything but the root node"
-for branch in tree(o)
+print tree[0][1]
+

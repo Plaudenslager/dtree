@@ -97,7 +97,7 @@ class Node:
         return len(self.branches)
 
     def update_backsolve(self, branch_number, value):
-        if self.node_type == 'E':
+        if value is not None and self.node_type == 'E':
             self.branches[branch_number]['backsolve'] = value * self.branches[branch_number]['probability']
         else:
             self.branches[branch_number]['backsolve'] = value

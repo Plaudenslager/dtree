@@ -23,7 +23,7 @@ print "\nCalculate width of tree"
 print 'width: %d' % tree.width()
 
 print "\nDelete a branch"
-tree.del_branch(0,3)
+tree.del_branch(0)
 tree.display()
 print 'width: %d' % tree.width()
 
@@ -54,7 +54,7 @@ print 'depth: %d' % tree.depth()
 print "\nDelete everything under the root node"
 while tree[0].width > 0:
     print tree[0].width
-    tree.del_branch(0,0)
+    tree.del_branch(0)
 
 tree.display()
 print 'width: %d' % tree.width()

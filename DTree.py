@@ -55,23 +55,25 @@ class Node:
         if self.node_type == 'E':
             self.best_node = None
             p = [b['probability'] for b in self.branches]
-            if sum(p) <> 1:
+            if None in p or sum(p) <> 1:
                 return None
             else:
                 a = [b['backsolve'] for b in self.branches]
-                try:
+                if None in a:
+                    return None
+                else:
                     return sum(a)
-                except:
-                    print "failed to calculate node_value for D:%s, using " % self.ID,
-                    print a
 
         else:
             a = [b['backsolve'] for b in self.branches]
-            max_value = max(a)
-            for index, value in enumerate(a):
-                if value == max_value:
-                    self._best_node = index
-                    return max_value
+            if None in a:
+                return None
+            else:
+                max_value = max(a)
+                for index, value in enumerate(a):
+                    if value == max_value:
+                        self._best_node = index
+                        return max_value
 
     @property
     def t_value(self,branch_number):
@@ -142,7 +144,7 @@ class Tree():
     def del_node(self, node_ID):
         if self[node_ID].width > 0:
             while self[node_ID].width >0:
-                self.del_branch(node_ID,0)
+                self.del_branch(node_ID)
         parent = self[node_ID].parent
         self.__update_parent(node_ID, clear=True)
         del self.nodes[node_ID]
@@ -153,18 +155,19 @@ class Tree():
         node.add_branch(description=description, cashflow=cashflow, probability=probability)
         self.__forward_solve()
 
-    def del_branch(self, node_ID, branch_number):
-        if branch_number > self[node_ID].width-1:
+    def del_branch(self, node_ID):
+        #Can only delete last branch
+        branch_number = self[node_ID].width-1
+        if branch_number <0:
             return
-        else:
-            branch = self[node_ID].branches[branch_number]
+        branch = self[node_ID].branches[branch_number]
+        if branch['child'] is not None:
+            self.del_node(branch['child'])
             if branch['child'] is not None:
-                self.del_node(branch['child'])
-                if branch['child'] is not None:
-                    print "********* WTF deleted child node, but is still listed in parent branch *********"
+                print "********* WTF deleted child node, but is still listed in parent branch *********"
 
-            self[node_ID].del_branch(branch_number)
-            self.__forward_solve()
+        self[node_ID].del_branch(branch_number)
+        self.__forward_solve()
 
     def width(self, node_ID=0):
         total_width = self[node_ID].width

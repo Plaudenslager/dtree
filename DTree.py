@@ -211,14 +211,13 @@ class Tree():
         return max_depth
 
     def __forward_solve(self, node_ID=0, cashflow=0):
-        #TODO: troubleshoot terminal values getting phantom values
         if self[node_ID].width > 0:
             for index, branch in enumerate(self[node_ID].branches):
-                cashflow += branch['cashflow']
+                cf = cashflow + branch['cashflow']
                 if branch['child'] is not None:
-                    backsolve = self.__forward_solve(branch['child'], cashflow)
+                    backsolve = self.__forward_solve(branch['child'], cf)
                 else:
-                    branch['t_value'] = cashflow
+                    branch['t_value'] = cf
                     backsolve = branch['t_value']
 
                 self[node_ID].update_backsolve(index, backsolve)

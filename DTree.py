@@ -53,7 +53,7 @@ class Node:
                 if None in a:
                     return None
                 else:
-                    return sum(a)
+                    return round(sum(a),2)
 
         else:
             a = [b['backsolve'] for b in self.branches]
@@ -64,7 +64,7 @@ class Node:
                 for index, value in enumerate(a):
                     if value == max_value:
                         self._best_node = index
-                        return max_value
+                        return round(max_value,2)
 
     @property
     def t_value(self,branch_number):

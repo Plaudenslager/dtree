@@ -36,16 +36,16 @@ class TestTreeFunctions(unittest.TestCase):
         self.tree[node_ID][0]['cashflow'] = -500
         self.tree[node_ID][0]['probability'] = .20
         self.tree[node_ID][1]['cashflow'] = 1000
-        self.tree[node_ID][1]['probability'] = .20
+        self.tree[node_ID][1]['probability'] = .25
         self.tree[node_ID][2]['cashflow'] = -3000
         self.tree[node_ID][2]['probability'] = .05
         self.tree[node_ID][3]['cashflow'] = 400
-        self.tree[node_ID][3]['probability'] = .55
-        # This node is worth 170
+        self.tree[node_ID][3]['probability'] = .50
+        # This node is worth 200
         self.tree.solve()
 
-        self.assertEqual(self.tree[node_ID].node_value, 170)
-        #self.assertEqual(self.tree[0].node_value, 250)
+        self.assertEqual(self.tree[node_ID].node_value, 200)
+        self.assertEqual(self.tree[0].node_value, 100)
 
 if __name__ == '__main__':
     unittest.main()

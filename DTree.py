@@ -122,6 +122,8 @@ class Tree():
             return
         self.clear_node(node_ID)
         node = self[node_ID]
+        if node.node_type <> node_type:
+            node.change_node()
         p = 1.0/branches
         while branches > 0:
             self.add_branch(node_ID,probability=p)

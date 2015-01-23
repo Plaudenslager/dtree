@@ -115,6 +115,7 @@ class Tree():
         # Create root node
         root = Node(ID=0)
         self.nodes[0] = root
+        self.nodes[0].parent = Parent_ID(0,0)
 
     def set_node(self, node_ID, node_type, branches, warn=True):
         if node_ID not in self.nodes:
@@ -182,7 +183,8 @@ class Tree():
 
     def display(self,node_ID=0,level=0, depth=0):
         if node_ID == 0:
-            print "%s:%s" %(self[node_ID].node_type,node_ID)
+            self.__forward_solve()
+            print "%s:%s bs: $%d" %(self[node_ID].node_type,node_ID, self[node_ID].node_value)
             depth = self.depth(0)
         if self[node_ID].width > 0:
             level += 1
@@ -190,11 +192,11 @@ class Tree():
                 #print "\t"*level, branch
                 if branch['child'] == None:
                     spacer_string = "-"*(8*depth-4*level)+">"
-                    print "\t"*level,"%s cf: %d, p: %.1f%%, bs: %d %s %d" % (branch['description'], branch['cashflow'],
+                    print "\t"*level,"%s cf: $%d, p: %.1f%%, bs: $%d %s %d" % (branch['description'], branch['cashflow'],
                                                                    branch['probability']*100, branch['backsolve'],
                                                                    spacer_string, branch['t_value'])
                 else:
-                    print "\t"*level,"%s cf: %d, p: %.1f%%, bs: %d\t%s:%s" %(branch['description'],branch['cashflow'],
+                    print "\t"*level,"%s cf: $%d, p: %.1f%%, bs: $%d\t%s:%s" %(branch['description'],branch['cashflow'],
                                                                          branch['probability']*100, branch['backsolve'],
                                                                          self[branch['child']].node_type, branch['child'])
                     self.display(branch['child'],level+1,depth)
@@ -209,6 +211,7 @@ class Tree():
         return max_depth
 
     def __forward_solve(self, node_ID=0, cashflow=0):
+        #TODO: troubleshoot terminal values getting phantom values
         if self[node_ID].width > 0:
             for index, branch in enumerate(self[node_ID].branches):
                 cashflow += branch['cashflow']
@@ -247,6 +250,41 @@ def CommandLoop():
     tree = Tree()
     tree.set_node(0,cmd,branches)
     tree.display()
+
+    node_ID = 0
+    while cmd_string not in ['q','Q']:
+        branch = None
+        while branch not in range(0,tree[node_ID].width):
+            cmd_string = raw_input('Enter branch number to edit, or U to move up to parent node >')
+            if cmd_string[0] == 'U':
+                node_ID = tree[node_ID][branch].parent.node_ID
+                print '(now operating on node: %s)' %node_ID
+            else:
+                branch = int(cmd_string)
+
+        cmd_string = raw_input('Enter cf#, p#, D#, or E# to set cashflow, probability, D or E; C to enter child node>')
+        if cmd_string[0] == 'C':
+            c_ID = tree[node_ID][branch]['child']
+            if c_ID is not None:
+                node_ID = tree[node_ID][branch]['child']
+                print '(now operating on node: %s)' %node_ID
+
+        if cmd_string[0:2] == 'cf':
+            tree[node_ID][branch]['cashflow'] = int(cmd_string[2:])
+            print '(set node %s branch %d cashflow to $%d)' %(node_ID, branch, int(cmd_string[2:]))
+        if cmd_string[0] == 'p':
+            tree[node_ID][branch]['probability'] = float(cmd_string[1:])
+            print '(set node %s branch %d probability to %f%%)' %(node_ID, branch, float(cmd_string[1:]))
+        if cmd_string[0].upper() in ['D','E']:
+            cmd = cmd_string[0].upper()
+            branches = int(cmd_string[1:])
+            parent=Parent_ID(node_ID,branch)
+            tree.add_node(parent, cmd, branches=branches)
+            print '(add %s node with %d branches to branch %d )' %(cmd, int(cmd_string[1:]), branch)
+
+
+        tree.display()
+
 
 if __name__ == '__main__':
     CommandLoop()

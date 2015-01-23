@@ -255,10 +255,12 @@ def CommandLoop():
     while cmd_string not in ['q','Q']:
         branch = None
         while branch not in range(0,tree[node_ID].width):
+            #TODO: fix function to go up to parent node - currently breaks the branch selection loop
             cmd_string = raw_input('Enter branch number to edit, or U to move up to parent node >')
-            if cmd_string[0] == 'U':
-                node_ID = tree[node_ID][branch].parent.node_ID
+            if cmd_string[0].upper() == 'U':
                 print '(now operating on node: %s)' %node_ID
+                node_ID = tree[node_ID][branch].parent.node_ID
+                continue
             else:
                 branch = int(cmd_string)
 

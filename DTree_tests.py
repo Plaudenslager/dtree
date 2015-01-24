@@ -51,8 +51,10 @@ class TestTreeFunctions(unittest.TestCase):
         self.assertEqual(self.tree[0].best_branch,1)
 
     def test_wide(self):
-        # Verify that a wide tree can be created
-        root_width = 10
+        # Verify that a very wide tree can be created
+        root_width = 30
+        child_width = 30
+
         self.assertEqual(self.tree.width(), 1)
 
         self.tree.set_node(0,'D',root_width)
@@ -60,23 +62,26 @@ class TestTreeFunctions(unittest.TestCase):
 
         for branch in range(0,root_width):
             parent = Parent_ID(0, branch)
-            self.tree.add_node(parent,'E', branches=10)
-            self.assertEqual(self.tree.width(),(branch+1)*9+10)
+            self.tree.add_node(parent,'E', branches=child_width)
+            self.assertEqual(self.tree.width(),(branch+1)*(child_width-1)+root_width)
 
-        self.assertEqual(self.tree.width(), 100)
+        self.assertEqual(self.tree.width(), child_width*root_width)
         self.assertEqual(self.tree.depth(),2)
 
     def test_deep(self):
-        # Verify that a deep tree can be created
-        depth = 10
+        # Verify that a very deep tree can be created
+        depth = 1000
         self.tree.set_node(0,'D', 3)
         node_ID = 0
         for level in range(1, depth):
             parent = Parent_ID(node_ID, 1)
             node_ID = self.tree.add_node(parent,'E', branches=3)
 
-        self.assertEqual(self.tree.width(), 21)
-        self.assertEqual(self.tree.depth(), 10)
+            self.assertEqual(self.tree.depth(), level+1)
+            self.assertEqual(self.tree.width(), 2*level+3)
+
+        self.assertEqual(self.tree.width(), 2*depth+1)
+        self.assertEqual(self.tree.depth(), depth)
 
 
 

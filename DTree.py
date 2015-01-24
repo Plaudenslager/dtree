@@ -10,7 +10,8 @@ class Parent_ID:
 class Node:
     def __init__(self, node_type='D', ID=None):
         node_type = node_type.upper()
-        if node_type not in ['D','E']: return
+        if node_type not in ['D','E']:
+            raise ReferenceError('Illegal node type: {}'.format(node_type))
 
         if ID == None:
             self.ID = str(uuid.uuid1()).split("-")[3]
@@ -135,10 +136,13 @@ class Tree():
 
     def add_node(self, parent_ID, node_type='D', ID=None, branches=2):
         if self[parent_ID.node_ID][parent_ID.branch_number]['child'] is not None:
-            print "***** WTF tried to add a node where one already exists ******"
-            return
+            raise ReferenceError('Tried to add a child node to branch {} of node {} that already has a child node {}'.format(parent_ID.node_ID,parent_ID.branch_number, self[parent_ID.node_ID][parent_ID.branch_number]['child']))
+
         branches = max(2,branches)
         node = Node(node_type,ID)
+        if node.ID in self.nodes:
+            raise ReferenceError('Duplicate node ID: {}'.format(node.ID))
+
         node.parent = parent_ID
         self.nodes[node.ID] = node
         self.__update_parent(node.ID)
@@ -163,12 +167,13 @@ class Tree():
         #Can only delete last branch
         branch_number = self[node_ID].width-1
         if branch_number <0:
-            return
+            raise ReferenceError('Illegal branch number {}'.format(branch_number))
+
         branch = self[node_ID].branches[branch_number]
         if branch['child'] is not None:
             self.del_node(branch['child'])
             if branch['child'] is not None:
-                print "********* WTF deleted child node, but is still listed in parent branch *********"
+                raise ReferenceError('failed to delete child node')
 
         self[node_ID].del_branch(branch_number)
         self.__forward_solve()
@@ -236,6 +241,7 @@ class Tree():
     def __update_parent(self, child_node_ID, clear=False):
         assert child_node_ID in self.nodes
         parent_ID = self[child_node_ID].parent
+        assert parent_ID.branch_number < len(self[parent_ID.node_ID].branches)
         if clear:
             self[parent_ID.node_ID].branches[parent_ID.branch_number]['child'] = None
         else:

@@ -220,7 +220,11 @@ class Tree():
             for index, branch in enumerate(self[node_ID].branches):
                 cf = cashflow + branch['cashflow']
                 if branch['child'] is not None:
-                    backsolve = branch['cashflow'] + self.__forward_solve(branch['child'], cf)
+                    downstream_investments = self.__forward_solve(branch['child'], cf)
+                    if downstream_investments is None:
+                        backsolve = None
+                    else:
+                        backsolve = branch['cashflow'] + downstream_investments
                 else:
                     branch['t_value'] = cf
                     backsolve = branch['cashflow']

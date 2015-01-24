@@ -47,5 +47,36 @@ class TestTreeFunctions(unittest.TestCase):
         self.assertEqual(self.tree[node_ID].node_value, 200)
         self.assertEqual(self.tree[0].node_value, 100)
 
+    def test_wide(self):
+        # Verify that a wide tree can be created
+        root_width = 10
+        self.assertEqual(self.tree.width(), 1)
+
+        self.tree.set_node(0,'D',root_width)
+        self.assertEqual(self.tree.width(), root_width)
+
+        for branch in range(0,root_width):
+            parent = Parent_ID(0, branch)
+            self.tree.add_node(parent,'E', branches = 10)
+            self.assertEqual(self.tree.width(),(branch+1)*9+10)
+
+        self.assertEqual(self.tree.width(), 100)
+        self.assertEqual(self.tree.depth(),2)
+
+    def test_deep(self):
+        # Verify that a deep tree can be created
+        depth = 10
+        self.tree.set_node(0,'D', 3)
+        node_ID = 0
+        for level in range(1, depth):
+            parent = Parent_ID(node_ID, 1)
+            node_ID = self.tree.add_node(parent,'E', 3)
+
+        self.assertEqual(self.tree.width(), 21)
+        self.assertEqual(self.tree.depth(), 10)
+
+
+
+
 if __name__ == '__main__':
     unittest.main()

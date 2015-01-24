@@ -18,6 +18,7 @@ class TestTreeFunctions(unittest.TestCase):
         self.tree.solve()
 
         self.assertEqual(self.tree[0].node_value, 100)
+        self.assertEqual(self.tree[0].best_branch,0)
 
         parent = Parent_ID(0,0)
         node_ID = self.tree.add_node(parent,'E',branches=2)
@@ -30,6 +31,7 @@ class TestTreeFunctions(unittest.TestCase):
 
         self.assertEqual(self.tree[node_ID].node_value,-20)
         self.assertEqual(self.tree[0].node_value, 80)
+        self.assertEqual(self.tree[0].best_branch,0)
 
         parent = Parent_ID(0,1)
         node_ID = self.tree.add_node(parent,'E',branches=4)
@@ -46,6 +48,7 @@ class TestTreeFunctions(unittest.TestCase):
 
         self.assertEqual(self.tree[node_ID].node_value, 200)
         self.assertEqual(self.tree[0].node_value, 100)
+        self.assertEqual(self.tree[0].best_branch,1)
 
     def test_wide(self):
         # Verify that a wide tree can be created
@@ -57,7 +60,7 @@ class TestTreeFunctions(unittest.TestCase):
 
         for branch in range(0,root_width):
             parent = Parent_ID(0, branch)
-            self.tree.add_node(parent,'E', branches = 10)
+            self.tree.add_node(parent,'E', branches=10)
             self.assertEqual(self.tree.width(),(branch+1)*9+10)
 
         self.assertEqual(self.tree.width(), 100)
@@ -70,7 +73,7 @@ class TestTreeFunctions(unittest.TestCase):
         node_ID = 0
         for level in range(1, depth):
             parent = Parent_ID(node_ID, 1)
-            node_ID = self.tree.add_node(parent,'E', 3)
+            node_ID = self.tree.add_node(parent,'E', branches=3)
 
         self.assertEqual(self.tree.width(), 21)
         self.assertEqual(self.tree.depth(), 10)

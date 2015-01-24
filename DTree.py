@@ -37,14 +37,14 @@ class Node:
             self.node_type = 'E'
 
     @property
-    def best_node(self):
-        a = self.node_value()
-        return self._best_node
+    def best_branch(self):
+        a = self.node_value
+        return self._best_branch
 
     @property
     def node_value(self):
         if self.node_type == 'E':
-            self.best_node = None
+            self._best_branch = None
             p = [b['probability'] for b in self.branches]
             if None in p or sum(p) <> 1:
                 return None
@@ -63,7 +63,7 @@ class Node:
                 max_value = max(a)
                 for index, value in enumerate(a):
                     if value == max_value:
-                        self._best_node = index
+                        self._best_branch = index
                         return round(max_value,2)
 
     @property
@@ -234,6 +234,7 @@ class Tree():
             return self[node_ID].node_value
 
     def __update_parent(self, child_node_ID, clear=False):
+        assert child_node_ID in self.nodes
         parent_ID = self[child_node_ID].parent
         if clear:
             self[parent_ID.node_ID].branches[parent_ID.branch_number]['child'] = None

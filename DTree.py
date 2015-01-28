@@ -208,6 +208,8 @@ class Tree():
         return max(total_width,1)
 
     def display(self,node_ID=0,level=0, depth=0):
+        # TODO: add probability to terminal events & display it here
+        # the node can probably set this when it calculates its value
         # TODO: fix alignment of terminal values,
         # possibly by assuming a max length for description and cashflow, then subtracting the actual lengths
 
@@ -347,79 +349,3 @@ def CommandLoop():
 if __name__ == '__main__':
     CommandLoop()
 
-from Tkinter import *
-class Application(Frame):
-
-    def say_hi(self):
-        print "Type change"
-
-    def do_branch(self):
-        print "Add branch"
-        self.draw_edge(2,self.column-1,1,1)
-
-
-    def do_node(self):
-        print "Add node"
-        row=2
-        self.draw_node('D',row,self.column)
-        self.column += 1
-
-    def createWidgets(self):
-        self.w = Canvas(self, width=600, height=600)
-        self.w.pack()
-
-        self.QUIT = Button(self)
-        self.QUIT["text"] = "QUIT"
-        self.QUIT["fg"] = "red"
-        self.QUIT["command"] = self.quit
-        self.QUIT.pack({"side": "left"})
-
-        self.change = Button(self)
-        self.change["text"] = "Change Type"
-        self.change["command"] = self.say_hi
-        self.change.pack({"side": "left"})
-
-        self.add_branch = Button(self)
-        self.add_branch["text"] = "Add Branch"
-        self.add_branch["command"] = self.do_branch
-        self.add_branch.pack({"side": "left"})
-
-        self.add_node = Button(self)
-        self.add_node["text"] = "Add Node"
-        self.add_node["command"] = self.do_node
-        self.add_node.pack({"side": "left"})
-
-    def draw_node(self,node_type,row,column):
-        start_x = column*self.column_width
-        start_y = row*self.node_size
-        end_x = start_x+self.node_size
-        end_y = start_y+self.node_size
-
-        if node_type == 'D':
-            print "drawing decision node at row: %d, column: %d" %(row,column)
-            self.w.create_rectangle(start_x,start_y,end_x,end_y)
-        if node_type == 'E':
-            print "drawing event node at row: %d, column: %d" %(row,column)
-            self.w.create_oval(start_x,start_y,end_x,end_y)
-
-    def draw_edge(self, row, column, edge_count, edge_no):
-        start_x = column*self.column_width+self.node_size
-        start_y = row*self.node_size+int(self.node_size*edge_no/(edge_count+1))
-        end_x = start_x+self.node_size*2
-        end_y = (row+(edge_no/edge_count+1))*self.node_size
-        self.w.create_line(start_x,start_y,end_x,end_y)
-
-
-    def __init__(self, master=None):
-        Frame.__init__(self, master)
-        self.pack()
-        self.createWidgets()
-        self.column = 1
-        self.node_size = 20
-        self.column_width = 5*self.node_size
-
-
-# root = Tk()
-# app = Application(master=root)
-# app.mainloop()
-# root.destroy()

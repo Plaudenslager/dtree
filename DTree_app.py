@@ -75,6 +75,56 @@ tree[nodeID][3]['cashflow'] = -200
 tree[nodeID][3]['probability'] = .25
 tree.display()
 
+print "\nWithout insurance, only minor accidents can be fixed for $100"
+print "Add events to one- and two- accident branches to consider odds of major or minor accidents"
+# get the right starting node
+nodeID = tree[0][1]['child']
+parent = Parent_ID(node_ID=nodeID, branch_number=2)
+new_node = tree.add_node(parent_ID=parent, node_type='E', branches=2)
+# adding a node returns the new node ID, so easy to grab it now, rather than walking the tree
+
+print "\nSet the description, cashflow, and probability for the branches"
+# this time we will use the node ID we got when we created the node
+# we might change the cashflow on the one-accident branch to 0, and set the minor & major accident cashflows here
+# to make it slightly easier, we leave the minor accident cashflow already listed alone, and just add the difference
+# for a major accident
+nodeID = new_node
+tree[nodeID][0]['description'] = 'minor accident'
+tree[nodeID][0]['cashflow'] = 0
+tree[nodeID][0]['probability'] = .70
+tree[nodeID][1]['description'] = 'major accident'
+tree[nodeID][1]['cashflow'] = -650
+tree[nodeID][1]['probability'] = .30
+
+print "Do it again for the two accident branch"
+# everything is the same, except for the branch number where we create the new node
+nodeID = tree[0][1]['child']
+parent = Parent_ID(node_ID=nodeID, branch_number=3)
+new_node = tree.add_node(parent_ID=parent, node_type='E', branches=2)
+
+print "\nSet the description, cashflow, and probability for the branches"
+# everything is the same as above, except for the node ID, which we got when it was created
+# also note that having to replace the phone twice is pretty expensive
+nodeID = new_node
+tree[nodeID][0]['description'] = 'minor accident'
+tree[nodeID][0]['cashflow'] = 0
+tree[nodeID][0]['probability'] = .70
+tree[nodeID][1]['description'] = 'major accident'
+tree[nodeID][1]['cashflow'] = -1300
+tree[nodeID][1]['probability'] = .30
+
+print "\nThis should be our final tree"
+tree.display()
+
+print "\nHow to read the tree:"
+print "* The backsolve value on the root node (D:0 bs:) tells us the average amount we will spend on accidents & insurance ($160)"
+print "* Our decision is to buy the insurance, because the backsolve for that is higher than for skip (-160 vs -246)"
+print "* With insurance, the expected cost of accidents is -60, because we multiply the probability by the cost of each outcome, as shown in each bs value"
+print "* So we add -60 to the cost of the insurance to find a total cost of -160"
+print "\n* Without insurance, the expected cost of accidents is -246; although the probabilities are the same, the costs are higher"
+print "\n* Also notice the terminal values at the end of the arrows"
+print "* They help indicate the worst-case scenarios, e.g. with insurance, max expense is -260; without could be -1500."
+
 print "\nCalculate width and depth of tree"
 print 'width: %d' % tree.width()
 print 'depth: %d' % tree.depth()

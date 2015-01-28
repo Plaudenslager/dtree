@@ -208,6 +208,9 @@ class Tree():
         return max(total_width,1)
 
     def display(self,node_ID=0,level=0, depth=0):
+        # TODO: fix alignment of terminal values,
+        # possibly by assuming a max length for description and cashflow, then subtracting the actual lengths
+
         if node_ID == 0:
             self.__forward_solve()
             print "%s:%s bs: $%d" %(self[node_ID].node_type,node_ID, self[node_ID].node_value)

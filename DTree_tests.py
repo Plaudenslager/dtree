@@ -69,8 +69,8 @@ class TestTreeFunctions(unittest.TestCase):
 
     def test_wide(self):
         # Verify that a very wide tree can be created
-        root_width = 30
-        child_width = 30
+        root_width = 300
+        child_width = 300
 
         self.assertEqual(self.tree.width(), 1)
 

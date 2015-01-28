@@ -38,7 +38,7 @@ print "\nSet the description, cashflow, and probability for the branches"
 nodeID = tree[0][0]['child']
 tree[nodeID][0]['description'] = 'no problems'
 tree[nodeID][0]['cashflow'] = 0
-tree[nodeID][0]['probability'] = .20
+tree[nodeID][0]['probability'] = .25
 tree[nodeID][1]['description'] = 'hardware defect'
 tree[nodeID][1]['cashflow'] = 0
 tree[nodeID][1]['probability'] = .25

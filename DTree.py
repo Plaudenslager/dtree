@@ -213,7 +213,7 @@ class Tree():
 
         if node_ID == 0:
             self.__forward_solve()
-            print "%s:%s bs: $%d" %(self[node_ID].node_type,node_ID, self[node_ID].node_value)
+            print "%s:%s bs: $%s" %(self[node_ID].node_type,node_ID, self[node_ID].node_value)
             depth = self.depth(0)
         if self[node_ID].width > 0:
             level += 1
@@ -225,7 +225,7 @@ class Tree():
                                                                    branch['probability']*100, branch['backsolve'],
                                                                    spacer_string, branch['t_value'])
                 else:
-                    print "\t"*level,"%s cf: $%d, p: %.1f%%, bs: $%d\t%s:%s" %(branch['description'],branch['cashflow'],
+                    print "\t"*level,"%s cf: $%d, p: %.1f%%, bs: $%s\t%s:%s" %(branch['description'],branch['cashflow'],
                                                                          branch['probability']*100, branch['backsolve'],
                                                                          self[branch['child']].node_type, branch['child'])
                     self.display(branch['child'],level+1,depth)

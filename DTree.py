@@ -62,6 +62,7 @@ class Node:
 
     @property
     def node_value(self):
+        if self.width == 0: return 0
         if self.node_type == 'E':
             self._best_branch = None
             p = [b['probability'] for b in self.branches]

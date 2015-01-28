@@ -7,7 +7,7 @@ Create a sample tree:
 
 Should I get insurance on my phone?
 If I do, it costs an extra $100, but covers all defects, and up to 2 accidents (which cost an extra $80 each)
-If I don't, the replacement cost of the phone is 750.
+If I don't, repairs cost $100, and replacement cost is 750.
 
 '''
 
@@ -47,6 +47,31 @@ tree[nodeID][2]['cashflow'] = -80
 tree[nodeID][2]['probability'] = .25
 tree[nodeID][3]['description'] = 'two accidents'
 tree[nodeID][3]['cashflow'] = -160
+tree[nodeID][3]['probability'] = .25
+tree.display()
+
+print "\nAdd child event to the skip insurance branch, with 4 branches"
+# same as before, but different branch_number
+parent = Parent_ID(node_ID=0, branch_number=1)
+tree.add_node(parent_ID=parent, node_type='E', branches=4)
+
+print "\nSet the description, cashflow, and probability for the branches"
+# same as before, but get a different nodeID by looking at the other branch
+# note that we duplicate the event from above, because the same outcomes could occur whether we have insurance or not
+# but we change the cashflows, because the insurance is not there to cover the problems
+
+nodeID = tree[0][1]['child']
+tree[nodeID][0]['description'] = 'no problems'
+tree[nodeID][0]['cashflow'] = 0
+tree[nodeID][0]['probability'] = .25
+tree[nodeID][1]['description'] = 'hardware defect'
+tree[nodeID][1]['cashflow'] = -100
+tree[nodeID][1]['probability'] = .25
+tree[nodeID][2]['description'] = 'one accident'
+tree[nodeID][2]['cashflow'] = -100
+tree[nodeID][2]['probability'] = .25
+tree[nodeID][3]['description'] = 'two accidents'
+tree[nodeID][3]['cashflow'] = -200
 tree[nodeID][3]['probability'] = .25
 tree.display()
 

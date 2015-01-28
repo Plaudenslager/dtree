@@ -243,8 +243,24 @@ class Tree():
         self.__forward_solve(0,0)
 
     def __forward_solve(self, node_ID=0, cashflow=0):
+        '''
+
+        :param node_ID: the node to be calculated
+        :param cashflow: cashflows accumulated from parent node
+        :return: backsolve value
+
+        forward solve adds up all the cashflows along a particular path from root to end leaf
+        back solve adds up all the downstream costs of a particular branch,
+        using expected values for downstream events, and best choice values for downstream decisions
+
+        This function typically starts with the root node and 0 cashflow,
+        then walks down all the paths passing the cashflows forward until it reaches the last branch.
+        Terminal value is calculated and updated, backsolve value is calculated, updated, and returned
+        to the caller (usually the previous instance of this function)
+        '''
         if self[node_ID].width > 0:
             for index, branch in enumerate(self[node_ID].branches):
+                # forward solve is the sum of all previous cashflows plus this cashflow
                 cf = cashflow + branch['cashflow']
                 if branch['child'] is not None:
                     downstream_investments = self.__forward_solve(branch['child'], cf)
@@ -253,11 +269,14 @@ class Tree():
                     else:
                         backsolve = branch['cashflow'] + downstream_investments
                 else:
+                    # Calculation for a leaf node
+                    # forward solve is the sum of all previous cashflows
                     branch['t_value'] = cf
                     backsolve = branch['cashflow']
 
                 self[node_ID].update_backsolve(index, backsolve)
 
+            # Need to return the backsolve value
             return self[node_ID].node_value
 
     def __update_parent(self, child_node_ID, clear=False):

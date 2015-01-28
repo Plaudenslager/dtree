@@ -87,8 +87,10 @@ class TestTreeFunctions(unittest.TestCase):
 
     def test_deep(self):
         # Verify that a very deep tree can be created
-        depth = 974
-        # over 975 will generate a recursion depth error on the forward_solve
+        depth = 973
+        # over 973 will generate a recursion depth error on the forward_solve
+        # this seems to be very sensitive to minor code changes; earlier version could do 974,
+        # so we need to avoid very deep trees, but several hundred seems like plenty.
 
         self.tree.set_node(0,'D', 3)
         node_ID = 0

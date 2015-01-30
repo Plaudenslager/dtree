@@ -20,6 +20,37 @@ Copyright 2014 Peter Laudenslager
 from DTree import Tree, Node, Parent_ID
 import unittest
 
+class TestNodeFunctions(unittest.TestCase):
+
+    def test_new_node(self):
+        # Defaults to node type D, creates a node ID, and creates an empty list for the branches
+        node = Node()
+        self.assertEqual(node.node_type, 'D')
+        self.assertIsNotNone(node.ID)
+        self.assertEqual(node.branches, [])
+
+        # Accepts legal node types; converts to upper case
+        for ntype in ['d','D','e','E']:
+            node = Node(node_type=ntype)
+            self.assertEqual(node.node_type, ntype.upper())
+
+        # Rejects illegal node types
+        self.assertRaises(ReferenceError, Node, node_type='junk')
+
+        # Works with the root node ID
+        node = Node(ID=0)
+        self.assertEqual(node.ID, '0')
+
+        # Works with a custom node ID; strips out spaces; converts to lower
+        node = Node(ID=' My Custom Node Name ')
+        self.assertEqual(node.ID, 'mycustomnodename')
+
+    # TODO Add test for add_branch
+
+    # TODO Add test for del_branch
+
+    # TODO Add test for change_node
+
 
 class TestTreeFunctions(unittest.TestCase):
 

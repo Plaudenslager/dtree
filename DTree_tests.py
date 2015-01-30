@@ -58,6 +58,16 @@ class TestTreeFunctions(unittest.TestCase):
         # create a tree
         self.tree = Tree()
 
+    def test_t_probability(self):
+        # verify the __solve_probability function
+        self.tree.set_node(0,'D',2)
+        self.tree[0][0]['cashflow'] = 300
+        self.tree[0][1]['cashflow'] = -300
+        self.tree.solve()
+
+        self.assertEqual(self.tree[0][0]['t_probability'], 1)
+        self.assertEqual(self.tree[0][1]['t_probability'], 0)
+
     def test_solution(self):
         # verify that the math all works properly for a moderately complex tree
         self.tree.set_node(0,'D',2)
@@ -67,6 +77,8 @@ class TestTreeFunctions(unittest.TestCase):
 
         self.assertEqual(self.tree[0].node_value, 100)
         self.assertEqual(self.tree[0].best_branch,0)
+        self.assertEqual(self.tree[0][0]['t_probability'], 1)
+        self.assertEqual(self.tree[0][1]['t_probability'], 0)
 
         parent = Parent_ID(0,0)
         node_ID = self.tree.add_node(parent,'E',branches=2)
@@ -80,6 +92,9 @@ class TestTreeFunctions(unittest.TestCase):
         self.assertEqual(self.tree[node_ID].node_value,-20)
         self.assertEqual(self.tree[0].node_value, 80)
         self.assertEqual(self.tree[0].best_branch,0)
+        self.assertEqual(self.tree[node_ID][0]['t_probability'], .6)
+        self.assertEqual(self.tree[node_ID][1]['t_probability'], .4)
+        self.assertEqual(self.tree[0][1]['t_probability'], 0)
 
         parent = Parent_ID(0,1)
         node_ID = self.tree.add_node(parent,'E',branches=4)
@@ -97,11 +112,15 @@ class TestTreeFunctions(unittest.TestCase):
         self.assertEqual(self.tree[node_ID].node_value, 200)
         self.assertEqual(self.tree[0].node_value, 100)
         self.assertEqual(self.tree[0].best_branch,1)
+        self.assertEqual(self.tree[node_ID][0]['t_probability'], .2)
+        self.assertEqual(self.tree[node_ID][1]['t_probability'], .25)
+        self.assertEqual(self.tree[node_ID][2]['t_probability'], .05)
+        self.assertEqual(self.tree[node_ID][3]['t_probability'], .5)
 
     def test_wide(self):
         # Verify that a very wide tree can be created
-        root_width = 300
-        child_width = 300
+        root_width = 30
+        child_width = 30
 
         self.assertEqual(self.tree.width(), 1)
 
@@ -118,7 +137,7 @@ class TestTreeFunctions(unittest.TestCase):
 
     def test_deep(self):
         # Verify that a very deep tree can be created
-        depth = 973
+        depth = 400
         # over 973 will generate a recursion depth error on the forward_solve
         # this seems to be very sensitive to minor code changes; earlier version could do 974,
         # so we need to avoid very deep trees, but several hundred seems like plenty.

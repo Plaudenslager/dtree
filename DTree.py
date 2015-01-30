@@ -243,6 +243,25 @@ class Tree():
 
     def solve(self):
         self.__forward_solve(0,0)
+        self.__solve_probability(0,1)
+
+    def __solve_probability(self, node_ID=0, probability=1):
+        if self[node_ID].width < 1: return
+        best_branch = self[node_ID].best_branch
+        for index, branch in enumerate(self[node_ID].branches):
+            # probability is product of all previous probabilities
+            if self[node_ID].node_type == 'D':
+                if index == best_branch:
+                    p = probability
+                else:
+                    p = 0
+            else:
+                p = probability * branch['probability']
+
+            if branch['child'] is not None:
+                self.__solve_probability(node_ID=branch['child'],probability=p)
+            else:
+                branch['t_probability'] = p
 
     def __forward_solve(self, node_ID=0, cashflow=0):
         '''

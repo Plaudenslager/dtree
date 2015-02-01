@@ -17,11 +17,11 @@ tree = Tree()
 tree.display()
 
 print "\nSet root node to decision with 3 branches"
-tree.set_node(node_ID=0,node_type='D', branches=3)
+tree.set_node(node_id=0, node_type='D', branches=3)
 tree.display()
 
 print "\nSet the description and cashflow for the branches"
-# specify a node and branch by tree[node_ID][branch_number_starting_with_0]
+# specify a node and branch by tree[node_id][branch_number_starting_with_0]
 tree[0][0]['description'] = 'MFG insurance'
 tree[0][0]['cashflow'] = -100
 tree[0][1]['description'] = 'Carrier insurance'
@@ -31,9 +31,9 @@ tree[0][2]['cashflow'] = 0
 tree.display()
 
 print "\nAdd child event to the MFG insurance branch, with 4 branches"
-# use Parent_ID to combine node_ID and branch_number, so the new node knows where to go on the tree
-parent = Parent_ID(node_ID=0, branch_number=0)
-tree.add_node(parent_ID=parent, node_type='E', branches=4)
+# use Parent_ID to combine node_id and branch_number, so the new node knows where to go on the tree
+parent = ParentID(node_id=0, branch_number=0)
+tree.add_node(parent_id=parent, node_type='E', branches=4)
 
 print "\nSet the description, cashflow, and probability for the branches"
 # get the child node ID by walking down the branch from the root node
@@ -54,9 +54,9 @@ tree[nodeID][3]['probability'] = .25
 tree.display()
 
 print "\nAdd child event to the Carrier insurance branch, with 4 branches"
-# use Parent_ID to combine node_ID and branch_number, so the new node knows where to go on the tree
-parent = Parent_ID(node_ID=0, branch_number=1)
-tree.add_node(parent_ID=parent, node_type='E', branches=4)
+# use Parent_ID to combine node_id and branch_number, so the new node knows where to go on the tree
+parent = ParentID(node_id=0, branch_number=1)
+tree.add_node(parent_id=parent, node_type='E', branches=4)
 
 print "\nSet the description, cashflow, and probability for the branches"
 # same as before, but get a different nodeID by looking at the other branch
@@ -80,8 +80,8 @@ tree.display()
 
 print "\nAdd child event to the skip insurance branch, with 4 branches"
 # same as before, but different branch_number
-parent = Parent_ID(node_ID=0, branch_number=2)
-tree.add_node(parent_ID=parent, node_type='E', branches=4)
+parent = ParentID(node_id=0, branch_number=2)
+tree.add_node(parent_id=parent, node_type='E', branches=4)
 
 print "\nSet the description, cashflow, and probability for the branches"
 # same as before, but get a different nodeID by looking at the other branch
@@ -107,8 +107,8 @@ print "\nWithout insurance, only minor accidents can be fixed for $100"
 print "Add events to one- and two- accident branches to consider odds of major or minor accidents"
 # get the right starting node
 nodeID = tree[0][2]['child']
-parent = Parent_ID(node_ID=nodeID, branch_number=2)
-new_node = tree.add_node(parent_ID=parent, node_type='E', branches=2)
+parent = ParentID(node_id=nodeID, branch_number=2)
+new_node = tree.add_node(parent_id=parent, node_type='E', branches=2)
 # adding a node returns the new node ID, so easy to grab it now, rather than walking the tree
 
 print "\nSet the description, cashflow, and probability for the branches"
@@ -127,8 +127,8 @@ tree[nodeID][1]['probability'] = .30
 print "Do it again for the two accident branch"
 # everything is the same, except for the branch number where we create the new node
 nodeID = tree[0][2]['child']
-parent = Parent_ID(node_ID=nodeID, branch_number=3)
-new_node = tree.add_node(parent_ID=parent, node_type='E', branches=2)
+parent = ParentID(node_id=nodeID, branch_number=3)
+new_node = tree.add_node(parent_id=parent, node_type='E', branches=2)
 
 print "\nSet the description, cashflow, and probability for the branches"
 # everything is the same as above, except for the node ID, which we got when it was created

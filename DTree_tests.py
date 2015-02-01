@@ -74,7 +74,7 @@ class TestTreeFunctions(unittest.TestCase):
         # each change should be length of the description + 7
         self.assertEqual(self.tree.max_description_length, 0)
 
-        self.tree.set_node(0,'D',4)
+        self.tree.set_node(0, 'D', 4)
         self.tree.solve()
         self.assertEqual(self.tree.max_description_length, 9)
 

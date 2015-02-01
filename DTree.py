@@ -43,7 +43,7 @@ class Node:
     def add_branch(self, description=None, cashflow=0, probability=0.0):
         if description==None:
             description = self.node_type+str(len(self.branches))
-        branch = dict(description=description, cashflow=cashflow, backsolve=0, probability=probability, child=None, t_value=0)
+        branch = dict(description=description, cashflow=cashflow, backsolve=0, probability=probability, child=None, t_value=0, t_probability=0)
         self.branches.append(branch)
 
     def del_branch(self, branch_number):
@@ -86,29 +86,29 @@ class Node:
                         self._best_branch = index
                         return round(max_value,2)
 
-    @property
-    def t_value(self,branch_number):
-        return self.branches[branch_number]['t_value']
+    # @property
+    # def t_value(self,branch_number):
+    #     return self.branches[branch_number]['t_value']
 
-    @t_value.setter
-    def t_value(self,branch_number,value):
-        self.branches[branch_number]['t_value'] = value
+    # @t_value.setter
+    # def t_value(self,branch_number,value):
+    #     self.branches[branch_number]['t_value'] = value
 
-    @property
-    def child(self, branch_number):
-        return self.branches[branch_number]['child']
+    # @property
+    # def child(self, branch_number):
+    #     return self.branches[branch_number]['child']
 
-    @child.setter
-    def child(self, branch_number, value):
-        self.branches[branch_number]['child'] = value
+    # @child.setter
+    # def child(self, branch_number, value):
+    #     self.branches[branch_number]['child'] = value
 
     @property
     def parent(self):
         return self.__parent_ID
 
     @parent.setter
-    def parent(self, parent_node_ID, branch_number):
-        self.__parent_ID = Parent_ID(parent_node_ID, branch_number)
+    def parent(self, Parent_ID):
+        self.__parent_ID = Parent_ID
 
     @property
     def width(self):
@@ -168,19 +168,19 @@ class Tree():
         for b in range(0, branches):
             p = 1.0 / branches
             node.add_branch(description=None, cashflow=0, probability=p)
-        self.__forward_solve()
+        self.solve()
         return node.ID
 
     def del_node(self, node_ID):
         self.clear_node(node_ID)
         self.__update_parent(node_ID, clear=True)
         del self.nodes[node_ID]
-        self.__forward_solve()
+        self.solve()
 
     def add_branch(self, node_ID, description=None, cashflow=0, probability=0.0):
         node = self[node_ID]
         node.add_branch(description=description, cashflow=cashflow, probability=probability)
-        self.__forward_solve()
+        self.solve()
 
     def del_branch(self, node_ID):
         #Can only delete last branch
@@ -208,13 +208,11 @@ class Tree():
         return max(total_width,1)
 
     def display(self,node_ID=0,level=0, depth=0):
-        # TODO: add probability to terminal events & display it here
-        # the node can probably set this when it calculates its value
         # TODO: fix alignment of terminal values,
         # possibly by assuming a max length for description and cashflow, then subtracting the actual lengths
 
         if node_ID == 0:
-            self.__forward_solve()
+            self.solve()
             print "%s:%s bs: $%s" %(self[node_ID].node_type,node_ID, self[node_ID].node_value)
             depth = self.depth(0)
         if self[node_ID].width > 0:
@@ -223,9 +221,9 @@ class Tree():
                 #print "\t"*level, branch
                 if branch['child'] == None:
                     spacer_string = "-"*(8*depth-4*level)+">"
-                    print "\t"*level,"%s cf: $%d, p: %.1f%%, bs: $%d %s %d" % (branch['description'], branch['cashflow'],
+                    print "\t"*level,"%s cf: $%d, p: %.1f%%, bs: $%d %s %d (%.1f%%)" % (branch['description'], branch['cashflow'],
                                                                    branch['probability']*100, branch['backsolve'],
-                                                                   spacer_string, branch['t_value'])
+                                                                   spacer_string, branch['t_value'], branch['t_probability']*100)
                 else:
                     print "\t"*level,"%s cf: $%d, p: %.1f%%, bs: $%s\t%s:%s" %(branch['description'],branch['cashflow'],
                                                                          branch['probability']*100, branch['backsolve'],
@@ -325,11 +323,11 @@ def CommandLoop():
         cmd = cmd_string[0].upper()
         branches = int(cmd_string[1:])
     tree = Tree()
-    tree.set_node(0,cmd,branches)
+    tree.set_node(0,cmd,branches) #TODO: code analysis says this could be referenced before assignment
     tree.display()
 
     node_ID = 0
-    while cmd_string not in ['q','Q']:
+    while cmd_string not in ['q','Q']: #TODO: code analysis says this could be referenced before assignment
         branch = None
         while branch not in range(0,tree[node_ID].width):
             #TODO: fix function to go up to parent node - currently breaks the branch selection loop

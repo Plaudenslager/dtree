@@ -27,15 +27,15 @@ class ParentID:
 
 
 class Node:
-    def __init__(self, node_type='D', id=None):
+    def __init__(self, node_type='D', guid=None):
         node_type = node_type.upper()
         if node_type not in ['D', 'E']:
             raise ReferenceError('Illegal node type: {}'.format(node_type))
 
-        if id is None:
+        if guid is None:
             self.ID = str(uuid.uuid1())
         else:
-            self.ID = str(id).strip().lower().replace(" ", "")
+            self.ID = str(guid).strip().lower().replace(" ", "")
 
         self.branches = []
         self.node_type = node_type
@@ -60,7 +60,8 @@ class Node:
 
     @property
     def best_branch(self):
-        a = self.node_value
+        # getting the node_value calculates and sets the private value for _best_branch
+        self.node_value
         return self._best_branch
 
     @property
@@ -138,11 +139,11 @@ class Tree():
         self.nodes = dict()
 
         # Create root node
-        root = Node(id=0)
+        root = Node(guid=0)
         self.nodes[0] = root
         self.nodes[0].parent = ParentID(0, 0)
 
-    def set_node(self, node_id, node_type, branches, warn=True):
+    def set_node(self, node_id, node_type, branches):
         if node_id not in self.nodes:
             return
         self.clear_node(node_id)
@@ -158,7 +159,7 @@ class Tree():
         while self[node_id].width > 0:
             self.del_branch(node_id)
 
-    def add_node(self, parent_id, node_type='D', id=None, branches=2):
+    def add_node(self, parent_id, node_type='D', guid=None, branches=2):
         if self[parent_id.node_id][parent_id.branch_number]['child'] is not None:
             raise ReferenceError(
                 'Tried to add a child node to branch {} of node {} that already has a child node {}'.format(
@@ -166,7 +167,7 @@ class Tree():
                     self[parent_id.node_id][parent_id.branch_number]['child']))
 
         branches = max(2, branches)
-        node = Node(node_type, id)
+        node = Node(node_type, guid)
         if node.ID in self.nodes:
             raise ReferenceError('Duplicate node ID: {}'.format(node.ID))
 
@@ -273,7 +274,7 @@ class Tree():
                 branch['t_probability'] = p
 
     def __forward_solve(self, node_id=0, cashflow=0):
-        '''
+        """
 
         :param node_id: the node to be calculated
         :param cashflow: cashflows accumulated from parent node
@@ -287,7 +288,7 @@ class Tree():
         then walks down all the paths passing the cashflows forward until it reaches the last branch.
         Terminal value is calculated and updated, backsolve value is calculated, updated, and returned
         to the caller (usually the previous instance of this function)
-        '''
+        """
         if self[node_id].width > 0:
             for index, branch in enumerate(self[node_id].branches):
                 # forward solve is the sum of all previous cashflows plus this cashflow

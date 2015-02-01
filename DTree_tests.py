@@ -37,12 +37,12 @@ class TestNodeFunctions(unittest.TestCase):
         # Rejects illegal node types
         self.assertRaises(ReferenceError, Node, node_type='junk')
 
-        # Works with the root node id
-        node = Node(id=0)
+        # Works with the root node guid
+        node = Node(guid=0)
         self.assertEqual(node.ID, '0')
 
         # Works with a custom node ID; strips out spaces; converts to lower
-        node = Node(id=' My Custom Node Name ')
+        node = Node(guid=' My Custom Node Name ')
         self.assertEqual(node.ID, 'mycustomnodename')
 
         # TODO Add test for add_branch

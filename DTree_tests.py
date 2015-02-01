@@ -69,27 +69,30 @@ class TestTreeFunctions(unittest.TestCase):
 
     def test_description_length(self):
         # verify that the calculation for __max_description_length works
+        # calculated on lengths of ['description', 'cashflow', 'probability', 'backsolve', 't_value']
+        # with defaults (with 4 branches), should be [2, 1, 4, 1, 1]
+        # each change should be length of the description + 7
         self.assertEqual(self.tree.max_description_length, 0)
 
         self.tree.set_node(0,'D',4)
         self.tree.solve()
-        self.assertEqual(self.tree.max_description_length, 2)
+        self.assertEqual(self.tree.max_description_length, 9)
 
         self.tree[0][0]['description'] = 'short'
         self.tree.solve()
-        self.assertEqual(self.tree.max_description_length, 5)
+        self.assertEqual(self.tree.max_description_length, 12)
 
         self.tree[0][1]['description'] = 'medium-length description'
         self.tree.solve()
-        self.assertEqual(self.tree.max_description_length, 25)
+        self.assertEqual(self.tree.max_description_length, 32)
 
         self.tree[0][2]['description'] = 'a relatively long description that takes a lot of space'
         self.tree.solve()
-        self.assertEqual(self.tree.max_description_length, 55)
+        self.assertEqual(self.tree.max_description_length, 62)
 
         self.tree[0][3]['description'] = 'an incredibly, and possibly unreasonably long description that will likely cause any print function to wrap the line'
         self.tree.solve()
-        self.assertEqual(self.tree.max_description_length, 116)
+        self.assertEqual(self.tree.max_description_length, 123)
 
     def test_solution(self):
         # verify that the math all works properly for a moderately complex tree

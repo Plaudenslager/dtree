@@ -265,7 +265,7 @@ class Tree():
 
         for index, branch in enumerate(self[node_id].branches):
             branch['text_len'] = 0
-            for item in ['description', 'cashflow', 'probability', 'backsolve', 't_value', 't_probability']:
+            for item in ['description', 'cashflow', 'probability', 'backsolve', 't_value']:
                 branch['text_len'] += len(str(branch[item]))
             self.__max_description_length = max(branch['text_len'], self.__max_description_length)
 

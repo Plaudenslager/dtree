@@ -125,9 +125,9 @@ class Node:
         else:
             self.branches[branch_number]['backsolve'] = value
 
-    def branch_number(self, branch_name):
-        a = [item['description'] for item in self.branches]
-        return a.index(branch_name)
+    # def branch_number(self, branch_name):
+    #     a = [item['description'] for item in self.branches]
+    #     return a.index(branch_name)
 
     def __getitem__(self, item):
         return self.branches[item]
@@ -142,6 +142,11 @@ class Tree():
         root = Node(guid=0)
         self.nodes[0] = root
         self.nodes[0].parent = ParentID(0, 0)
+        self.__max_description_length = 0
+
+    @property
+    def max_description_length(self):
+        return self.__max_description_length
 
     def set_node(self, node_id, node_type, branches):
         if node_id not in self.nodes:
@@ -217,9 +222,6 @@ class Tree():
         return max(total_width, 1)
 
     def display(self, node_id=0, level=0, depth=0):
-        # TODO: fix alignment of terminal values,
-        # possibly by assuming a max length for description and cashflow, then subtracting the actual lengths
-
         if node_id == 0:
             self.solve()
             print "%s:%s bs: $%s" % (self[node_id].node_type, node_id, self[node_id].node_value)
@@ -227,9 +229,9 @@ class Tree():
         if self[node_id].width > 0:
             level += 1
             for branch in self[node_id].branches:
-                # print "\t"*level, branch
                 if branch['child'] is None:
-                    spacer_string = "-" * (8 * depth - 4 * level) + ">"
+                    text_len = self.max_description_length - branch['text_len']
+                    spacer_string = "-" * (8 * depth - 4 * level + text_len) + ">"
                     print "\t" * level, "%s cf: $%d, p: %.1f%%, bs: $%d %s %d (%.1f%%)" % (
                         branch['description'], branch['cashflow'],
                         branch['probability'] * 100, branch['backsolve'],
@@ -257,8 +259,17 @@ class Tree():
     def __solve_probability(self, node_id=0, probability=1):
         if self[node_id].width < 1:
             return
-        best_branch = self[node_id].best_branch
+
+        if node_id == 0:
+            self.__max_description_length = 0
+
         for index, branch in enumerate(self[node_id].branches):
+            branch['text_len'] = 0
+            for item in ['description', 'cashflow', 'probability', 'backsolve', 't_value', 't_probability']:
+                branch['text_len'] += len(str(branch[item]))
+            self.__max_description_length = max(branch['text_len'], self.__max_description_length)
+
+            best_branch = self[node_id].best_branch
             # probability is product of all previous probabilities
             if self[node_id].node_type == 'D':
                 if index == best_branch:

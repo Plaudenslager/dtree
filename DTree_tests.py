@@ -67,6 +67,30 @@ class TestTreeFunctions(unittest.TestCase):
         self.assertEqual(self.tree[0][0]['t_probability'], 1)
         self.assertEqual(self.tree[0][1]['t_probability'], 0)
 
+    def test_description_length(self):
+        # verify that the calculation for __max_description_length works
+        self.assertEqual(self.tree.max_description_length, 0)
+
+        self.tree.set_node(0,'D',4)
+        self.tree.solve()
+        self.assertEqual(self.tree.max_description_length, 2)
+
+        self.tree[0][0]['description'] = 'short'
+        self.tree.solve()
+        self.assertEqual(self.tree.max_description_length, 5)
+
+        self.tree[0][1]['description'] = 'medium-length description'
+        self.tree.solve()
+        self.assertEqual(self.tree.max_description_length, 25)
+
+        self.tree[0][2]['description'] = 'a relatively long description that takes a lot of space'
+        self.tree.solve()
+        self.assertEqual(self.tree.max_description_length, 55)
+
+        self.tree[0][3]['description'] = 'an incredibly, and possibly unreasonably long description that will likely cause any print function to wrap the line'
+        self.tree.solve()
+        self.assertEqual(self.tree.max_description_length, 116)
+
     def test_solution(self):
         # verify that the math all works properly for a moderately complex tree
         self.tree.set_node(0, 'D', 2)

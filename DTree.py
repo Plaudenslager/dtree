@@ -17,33 +17,35 @@ Copyright 2014 Peter Laudenslager
 
    '''
 
-
 import uuid
+
 
 class Parent_ID:
     def __init__(self, node_ID, branch_number):
         self.node_ID = node_ID
         self.branch_number = branch_number
 
+
 class Node:
     def __init__(self, node_type='D', ID=None):
         node_type = node_type.upper()
-        if node_type not in ['D','E']:
+        if node_type not in ['D', 'E']:
             raise ReferenceError('Illegal node type: {}'.format(node_type))
 
-        if ID == None:
+        if ID is None:
             self.ID = str(uuid.uuid1())
         else:
-            self.ID = str(ID).strip().lower().replace(" ","")
+            self.ID = str(ID).strip().lower().replace(" ", "")
 
         self.branches = []
         self.__parent_ID = None
         self.node_type = node_type
 
     def add_branch(self, description=None, cashflow=0, probability=0.0):
-        if description==None:
-            description = self.node_type+str(len(self.branches))
-        branch = dict(description=description, cashflow=cashflow, backsolve=0, probability=probability, child=None, t_value=0, t_probability=0)
+        if description is None:
+            description = self.node_type + str(len(self.branches))
+        branch = dict(description=description, cashflow=cashflow, backsolve=0, probability=probability, child=None,
+                      t_value=0, t_probability=0)
         self.branches.append(branch)
 
     def del_branch(self, branch_number):
@@ -73,7 +75,7 @@ class Node:
                 if None in a:
                     return None
                 else:
-                    return round(sum(a),2)
+                    return round(sum(a), 2)
 
         else:
             a = [b['backsolve'] for b in self.branches]
@@ -84,11 +86,11 @@ class Node:
                 for index, value in enumerate(a):
                     if value == max_value:
                         self._best_branch = index
-                        return round(max_value,2)
+                        return round(max_value, 2)
 
     # @property
     # def t_value(self,branch_number):
-    #     return self.branches[branch_number]['t_value']
+    # return self.branches[branch_number]['t_value']
 
     # @t_value.setter
     # def t_value(self,branch_number,value):
@@ -127,6 +129,7 @@ class Node:
     def __getitem__(self, item):
         return self.branches[item]
 
+
 class Tree():
     def __init__(self):
         # K,V in nodes dictionary is ID, node object
@@ -135,7 +138,7 @@ class Tree():
         # Create root node
         root = Node(ID=0)
         self.nodes[0] = root
-        self.nodes[0].parent = Parent_ID(0,0)
+        self.nodes[0].parent = Parent_ID(0, 0)
 
     def set_node(self, node_ID, node_type, branches, warn=True):
         if node_ID not in self.nodes:
@@ -144,21 +147,24 @@ class Tree():
         node = self[node_ID]
         if node.node_type <> node_type:
             node.change_node()
-        p = 1.0/branches
+        p = 1.0 / branches
         while branches > 0:
-            self.add_branch(node_ID,probability=p)
+            self.add_branch(node_ID, probability=p)
             branches -= 1
 
     def clear_node(self, node_ID):
-        while self[node_ID].width >0:
+        while self[node_ID].width > 0:
             self.del_branch(node_ID)
 
     def add_node(self, parent_ID, node_type='D', ID=None, branches=2):
         if self[parent_ID.node_ID][parent_ID.branch_number]['child'] is not None:
-            raise ReferenceError('Tried to add a child node to branch {} of node {} that already has a child node {}'.format(parent_ID.node_ID,parent_ID.branch_number, self[parent_ID.node_ID][parent_ID.branch_number]['child']))
+            raise ReferenceError(
+                'Tried to add a child node to branch {} of node {} that already has a child node {}'.format(
+                    parent_ID.node_ID, parent_ID.branch_number,
+                    self[parent_ID.node_ID][parent_ID.branch_number]['child']))
 
-        branches = max(2,branches)
-        node = Node(node_type,ID)
+        branches = max(2, branches)
+        node = Node(node_type, ID)
         if node.ID in self.nodes:
             raise ReferenceError('Duplicate node ID: {}'.format(node.ID))
 
@@ -183,9 +189,9 @@ class Tree():
         self.solve()
 
     def del_branch(self, node_ID):
-        #Can only delete last branch
-        branch_number = self[node_ID].width-1
-        if branch_number <0:
+        # Can only delete last branch
+        branch_number = self[node_ID].width - 1
+        if branch_number < 0:
             raise ReferenceError('Illegal branch number {}'.format(branch_number))
 
         branch = self[node_ID].branches[branch_number]
@@ -204,33 +210,35 @@ class Tree():
                 if branch['child'] is not None:
                     child_width = self.width(branch['child'])
                     if child_width > 0:
-                        total_width += child_width -1
-        return max(total_width,1)
+                        total_width += child_width - 1
+        return max(total_width, 1)
 
-    def display(self,node_ID=0,level=0, depth=0):
+    def display(self, node_ID=0, level=0, depth=0):
         # TODO: fix alignment of terminal values,
         # possibly by assuming a max length for description and cashflow, then subtracting the actual lengths
 
         if node_ID == 0:
             self.solve()
-            print "%s:%s bs: $%s" %(self[node_ID].node_type,node_ID, self[node_ID].node_value)
+            print "%s:%s bs: $%s" % (self[node_ID].node_type, node_ID, self[node_ID].node_value)
             depth = self.depth(0)
         if self[node_ID].width > 0:
             level += 1
             for branch in self[node_ID].branches:
-                #print "\t"*level, branch
-                if branch['child'] == None:
-                    spacer_string = "-"*(8*depth-4*level)+">"
-                    print "\t"*level,"%s cf: $%d, p: %.1f%%, bs: $%d %s %d (%.1f%%)" % (branch['description'], branch['cashflow'],
-                                                                   branch['probability']*100, branch['backsolve'],
-                                                                   spacer_string, branch['t_value'], branch['t_probability']*100)
+                # print "\t"*level, branch
+                if branch['child'] is None:
+                    spacer_string = "-" * (8 * depth - 4 * level) + ">"
+                    print "\t" * level, "%s cf: $%d, p: %.1f%%, bs: $%d %s %d (%.1f%%)" % (
+                        branch['description'], branch['cashflow'],
+                        branch['probability'] * 100, branch['backsolve'],
+                        spacer_string, branch['t_value'], branch['t_probability'] * 100)
                 else:
-                    print "\t"*level,"%s cf: $%d, p: %.1f%%, bs: $%s\t%s:%s" %(branch['description'],branch['cashflow'],
-                                                                         branch['probability']*100, branch['backsolve'],
-                                                                         self[branch['child']].node_type, branch['child'])
-                    self.display(branch['child'],level+1,depth)
+                    print "\t" * level, "%s cf: $%d, p: %.1f%%, bs: $%s\t%s:%s" % (
+                        branch['description'], branch['cashflow'],
+                        branch['probability'] * 100, branch['backsolve'],
+                        self[branch['child']].node_type, branch['child'])
+                    self.display(branch['child'], level + 1, depth)
 
-    def depth(self,node_ID=0):
+    def depth(self, node_ID=0):
         max_depth = 1
         if self[node_ID].width > 0:
             for branch in self[node_ID].branches:
@@ -240,8 +248,8 @@ class Tree():
         return max_depth
 
     def solve(self):
-        self.__forward_solve(0,0)
-        self.__solve_probability(0,1)
+        self.__forward_solve(0, 0)
+        self.__solve_probability(0, 1)
 
     def __solve_probability(self, node_ID=0, probability=1):
         if self[node_ID].width < 1: return
@@ -257,7 +265,7 @@ class Tree():
                 p = probability * branch['probability']
 
             if branch['child'] is not None:
-                self.__solve_probability(node_ID=branch['child'],probability=p)
+                self.__solve_probability(node_ID=branch['child'], probability=p)
             else:
                 branch['t_probability'] = p
 
@@ -312,28 +320,30 @@ class Tree():
             print "***** WTF tried to get a non-existent node ID: %s", item
         return self.nodes[item]
 
+
 def InteractiveTreeMain():
     # provide interactive command line for interacting with a tree
     pass
 
+
 def CommandLoop():
     cmd = None
-    while cmd not in ['D','E']:
+    while cmd not in ['D', 'E']:
         cmd_string = raw_input('Enter D# or E# to create a new Decision or Event with # branches >')
         cmd = cmd_string[0].upper()
         branches = int(cmd_string[1:])
     tree = Tree()
-    tree.set_node(0,cmd,branches) #TODO: code analysis says this could be referenced before assignment
+    tree.set_node(0, cmd, branches)  # TODO: code analysis says this could be referenced before assignment
     tree.display()
 
     node_ID = 0
-    while cmd_string not in ['q','Q']: #TODO: code analysis says this could be referenced before assignment
+    while cmd_string not in ['q', 'Q']:  # TODO: code analysis says this could be referenced before assignment
         branch = None
-        while branch not in range(0,tree[node_ID].width):
+        while branch not in range(0, tree[node_ID].width):
             #TODO: fix function to go up to parent node - currently breaks the branch selection loop
             cmd_string = raw_input('Enter branch number to edit, or U to move up to parent node >')
             if cmd_string[0].upper() == 'U':
-                print '(now operating on node: %s)' %node_ID
+                print '(now operating on node: %s)' % node_ID
                 node_ID = tree[node_ID][branch].parent.node_ID
                 continue
             else:
@@ -344,21 +354,20 @@ def CommandLoop():
             c_ID = tree[node_ID][branch]['child']
             if c_ID is not None:
                 node_ID = tree[node_ID][branch]['child']
-                print '(now operating on node: %s)' %node_ID
+                print '(now operating on node: %s)' % node_ID
 
         if cmd_string[0:2] == 'cf':
             tree[node_ID][branch]['cashflow'] = int(cmd_string[2:])
-            print '(set node %s branch %d cashflow to $%d)' %(node_ID, branch, int(cmd_string[2:]))
+            print '(set node %s branch %d cashflow to $%d)' % (node_ID, branch, int(cmd_string[2:]))
         if cmd_string[0] == 'p':
             tree[node_ID][branch]['probability'] = float(cmd_string[1:])
-            print '(set node %s branch %d probability to %f%%)' %(node_ID, branch, float(cmd_string[1:]))
-        if cmd_string[0].upper() in ['D','E']:
+            print '(set node %s branch %d probability to %f%%)' % (node_ID, branch, float(cmd_string[1:]))
+        if cmd_string[0].upper() in ['D', 'E']:
             cmd = cmd_string[0].upper()
             branches = int(cmd_string[1:])
-            parent=Parent_ID(node_ID,branch)
+            parent = Parent_ID(node_ID, branch)
             tree.add_node(parent, cmd, branches=branches)
-            print '(add %s node with %d branches to branch %d )' %(cmd, int(cmd_string[1:]), branch)
-
+            print '(add %s node with %d branches to branch %d )' % (cmd, int(cmd_string[1:]), branch)
 
         tree.display()
 

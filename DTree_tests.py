@@ -145,8 +145,8 @@ class TestTreeFunctions(unittest.TestCase):
 
     def test_wide(self):
         # Verify that a very wide tree can be created
-        root_width = 30
-        child_width = 30
+        root_width = 15
+        child_width = 15
 
         self.assertEqual(self.tree.width(), 1)
 
@@ -163,7 +163,7 @@ class TestTreeFunctions(unittest.TestCase):
 
     def test_deep(self):
         # Verify that a very deep tree can be created
-        depth = 400
+        depth = 100
         # over 973 will generate a recursion depth error on the forward_solve
         # this seems to be very sensitive to minor code changes; earlier version could do 974,
         # so we need to avoid very deep trees, but several hundred seems like plenty.

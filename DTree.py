@@ -58,6 +58,20 @@ class Node:
         else:
             self.node_type = 'E'
 
+    def sensitivity(self):
+        # run through the nodes,
+        # figure out the required change to each cashflow to change decision
+        # then run through the backsloves for the same reason
+
+        # get the number to beat
+        best_node_cashflow = self.branches[self.best_branch]['cashflow']
+        for branch in self.branches:
+            branch['cf_delta'] = best_node_cashflow - branch['cashflow']
+        # this will give the current best node a sensitivity of 0,
+        # but it should be the difference between its own cashflow and the next best cashflow
+        # TODO: calculate the correct sensitivity for the current best node
+        # TODO: calculate the sensitivity for event nodes
+
     @property
     def best_branch(self):
         # getting the node_value calculates and sets the private value for _best_branch
@@ -252,6 +266,24 @@ class Tree():
                     max_depth = max(max_depth, branch_depth)
         return max_depth
 
+    def describe_tree(self):
+        # TODO: Build function to describe recommendations from tree
+        pass
+
+    # Todo: Factor out depth-first, width-first searches for use with other functions, like solve & describe
+
+
+    def sensitivity_analysis(self, node_id=0, data=0):
+        '''
+        For a node, calculate the change to each cashflow to shift the decision
+        For events, calculate the change to each probability to shift the upstream decision
+        calculate how much each backsolve must change to shift the upstream decision
+        '''
+
+        if self[node_id].width < 1:
+            return
+        self[node_id].sensitivity()
+
     def solve(self):
         self.__forward_solve(0, 0)
         self.__solve_probability(0, 1)
@@ -334,12 +366,6 @@ class Tree():
         if item not in self.nodes:
             print "***** WTF tried to get a non-existent node ID: %s", item
         return self.nodes[item]
-
-
-def interactive_tree_main():
-    # provide interactive command line for interacting with a tree
-    pass
-
 
 def command_loop():
     cmd = None

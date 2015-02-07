@@ -67,10 +67,10 @@ class Node:
         best_node_cashflow = self.branches[self.best_branch]['cashflow']
         for branch in self.branches:
             branch['cf_delta'] = best_node_cashflow - branch['cashflow']
-        # this will give the current best node a sensitivity of 0,
-        # but it should be the difference between its own cashflow and the next best cashflow
-        # TODO: calculate the correct sensitivity for the current best node
-        # TODO: calculate the sensitivity for event nodes
+            # this will give the current best node a sensitivity of 0,
+            # but it should be the difference between its own cashflow and the next best cashflow
+            # TODO: calculate the correct sensitivity for the current best node
+            # TODO: calculate the sensitivity for event nodes
 
     @property
     def best_branch(self):
@@ -119,7 +119,7 @@ class Node:
 
     # @child.setter
     # def child(self, branch_number, value):
-    #     self.branches[branch_number]['child'] = value
+    # self.branches[branch_number]['child'] = value
 
     @property
     def parent(self):
@@ -274,13 +274,12 @@ class Tree():
 
     # Todo: Factor out depth-first, width-first searches for use with other functions, like solve & describe
 
-
     def sensitivity_analysis(self, node_id=0, data=0):
-        '''
+        """
         For a node, calculate the change to each cashflow to shift the decision
         For events, calculate the change to each probability to shift the upstream decision
         calculate how much each backsolve must change to shift the upstream decision
-        '''
+        """
 
         if self[node_id].width < 1:
             return
@@ -368,6 +367,7 @@ class Tree():
         if item not in self.nodes:
             print "***** WTF tried to get a non-existent node ID: %s", item
         return self.nodes[item]
+
 
 def command_loop():
     cmd = None

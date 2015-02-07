@@ -186,6 +186,8 @@ class Tree():
                     self[parent_id.node_id][parent_id.branch_number]['child']))
 
         branches = max(2, branches)
+        if guid is None:
+            guid = len(self.nodes)
         node = Node(node_type, guid)
         if node.ID in self.nodes:
             raise ReferenceError('Duplicate node ID: {}'.format(node.ID))

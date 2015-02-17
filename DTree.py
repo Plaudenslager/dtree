@@ -45,8 +45,8 @@ class Node:
     def add_branch(self, description=None, cashflow=0, probability=0.0):
         if description is None:
             description = self.node_type + str(len(self.branches))
-        branch = dict(description=description, cashflow=cashflow, backsolve=0, probability=probability, child=None,
-                      t_value=0, t_probability=0)
+        branch = dict(description=description, cashflow=cashflow, backsolve=cashflow, probability=probability, child=None,
+                      t_value=0, t_probability=0, cf_delta=0)
         self.branches.append(branch)
 
     def del_branch(self, branch_number):
@@ -58,19 +58,23 @@ class Node:
         else:
             self.node_type = 'E'
 
-    def sensitivity(self):
-        # run through the nodes,
-        # figure out the required change to each cashflow to change decision
-        # then run through the backsloves for the same reason
+    def update_sensitivity(self):
+        # Calculates and populates the cf_delta value for each branch
+        # The total cashflow for the branch would have to increase by more than this amount to change the decision
 
         # get the number to beat
-        best_node_cashflow = self.branches[self.best_branch]['cashflow']
-        for branch in self.branches:
-            branch['cf_delta'] = best_node_cashflow - branch['cashflow']
-            # this will give the current best node a sensitivity of 0,
-            # but it should be the difference between its own cashflow and the next best cashflow
-            # TODO: calculate the correct sensitivity for the current best node
-            # TODO: calculate the sensitivity for event nodes
+        best_branch = self.best_branch
+        best_cashflow = self.branches[best_branch]['cashflow']
+
+        # run through the nodes, figure out the required change to each cashflow to change decision
+        deltas = [best_cashflow-b['cashflow'] for b in self.branches]
+        for index, branch in enumerate(self.branches):
+            branch['cf_delta'] = deltas[index]
+
+        deltas.remove(0)
+        self.branches[best_branch]['cf_delta'] = min(deltas)
+
+        # TODO: calculate the sensitivity for event nodes
 
     @property
     def best_branch(self):
@@ -273,6 +277,7 @@ class Tree():
         pass
 
     # Todo: Factor out depth-first, width-first searches for use with other functions, like solve & describe
+    # Todo: Allow trees to be saved to adn recovered from disk
 
     def sensitivity_analysis(self, node_id=0, data=0):
         """
@@ -283,7 +288,7 @@ class Tree():
 
         if self[node_id].width < 1:
             return
-        self[node_id].sensitivity()
+        self[node_id].update_sensitivity()
 
     def solve(self):
         self.__forward_solve(0, 0)

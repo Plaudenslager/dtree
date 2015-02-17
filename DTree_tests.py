@@ -45,6 +45,24 @@ class TestNodeFunctions(unittest.TestCase):
         node = Node(guid=' My Custom Node Name ')
         self.assertEqual(node.ID, 'mycustomnodename')
 
+    def test_sensitivity(self):
+        node = Node()
+
+        # Create branches with all positive values
+        node.add_branch(cashflow= 0)
+        node.add_branch(cashflow= 1)
+        node.add_branch(cashflow= 2)
+        node.add_branch(cashflow= 3)
+        node.add_branch(cashflow= 4)
+
+        node.update_sensitivity()
+
+        self.assertEqual(node[0]['cf_delta'], 4)
+        self.assertEqual(node[1]['cf_delta'], 3)
+        self.assertEqual(node[2]['cf_delta'], 2)
+        self.assertEqual(node[3]['cf_delta'], 1)
+        self.assertEqual(node[4]['cf_delta'], 1)
+
         # TODO Add test for add_branch
 
         # TODO Add test for del_branch

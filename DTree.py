@@ -72,7 +72,7 @@ class Node:
             branch['cf_delta'] = deltas[index]
 
         deltas.remove(0)
-        self.branches[best_branch]['cf_delta'] = min(deltas)
+        self.branches[best_branch]['cf_delta'] = -min(deltas)
 
         # TODO: calculate the sensitivity for event nodes
 

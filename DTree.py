@@ -59,22 +59,24 @@ class Node:
             self.node_type = 'E'
 
     def update_sensitivity(self):
-        # Calculates and populates the cf_delta value for each branch
-        # The total cashflow for the branch would have to increase by more than this amount to change the decision
+        if self.node_type == 'D':
+            # Calculates and populates the cf_delta value for each branch
+            # The total cashflow for the branch would have to increase by more than this amount to change the decision
 
-        # get the number to beat
-        best_branch = self.best_branch
-        best_cashflow = self.branches[best_branch]['cashflow']
+            # get the number to beat
+            best_branch = self.best_branch
+            best_cashflow = self.branches[best_branch]['cashflow']
 
-        # run through the nodes, figure out the required change to each cashflow to change decision
-        deltas = [best_cashflow-b['cashflow'] for b in self.branches]
-        for index, branch in enumerate(self.branches):
-            branch['cf_delta'] = deltas[index]
+            # run through the nodes, figure out the required change to each cashflow to change decision
+            deltas = [best_cashflow-b['cashflow'] for b in self.branches]
+            for index, branch in enumerate(self.branches):
+                branch['cf_delta'] = deltas[index]
 
-        deltas.remove(0)
-        self.branches[best_branch]['cf_delta'] = -min(deltas)
-
-        # TODO: calculate the sensitivity for event nodes
+            deltas.remove(0)
+            self.branches[best_branch]['cf_delta'] = -min(deltas)
+        else:
+            # TODO: calculate the sensitivity for event nodes
+            pass
 
     @property
     def best_branch(self):

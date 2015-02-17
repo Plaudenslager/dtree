@@ -58,7 +58,7 @@ class Node:
         else:
             self.node_type = 'E'
 
-    def update_sensitivity(self):
+    def update_sensitivity(self, parent_delta=None):
         if self.node_type == 'D':
             # Calculates and populates the cf_delta value for each branch
             # The total cashflow for the branch would have to increase by more than this amount to change the decision
@@ -76,6 +76,20 @@ class Node:
             self.branches[best_branch]['cf_delta'] = -min(deltas)
         else:
             # TODO: calculate the sensitivity for event nodes
+            # Events are sensitive to both cashflow and to probability
+            # What we need to know is if changing one of those values results in meeting the cashflow requirements
+            # of the parent decision
+            # Will need to think about layered events
+            # So we need to know the sensitivity of the parent node, which we don't know in the node
+            if parent_delta is None:
+                return
+            else:
+                # find the cashflow change in each branch that will match the parent_delta
+                # expected value is sum of weighted values; keeping the weights the same,
+                gap = parent_delta - self.node_value
+                deltas = [gap / b['probability'] for b in self.branches]
+                for index, branch in enumerate(self.branches):
+                    branch['cf_delta'] = round(deltas[index],3)
             pass
 
     @property
@@ -91,9 +105,14 @@ class Node:
         if self.node_type == 'E':
             self._best_branch = None
             p = [b['probability'] for b in self.branches]
-            if None in p or sum(p) != 1:
+            if None in p or round(sum(p),2) != 1.0:
+                assert round(sum(p)) == 1.0
                 return None
             else:
+                for branch in self.branches:
+                    if branch['child'] is None:
+                        branch['backsolve'] = branch['cashflow']*branch['probability']
+
                 a = [b['backsolve'] for b in self.branches]
                 if None in a:
                     return None

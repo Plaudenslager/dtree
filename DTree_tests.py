@@ -58,6 +58,7 @@ class TestNodeFunctions(unittest.TestCase):
 
         node.update_sensitivity()
 
+        self.assertEqual(node.node_value, 4)
         self.assertEqual(node[0]['cf_delta'], 4)
         self.assertEqual(node[1]['cf_delta'], 3)
         self.assertEqual(node[2]['cf_delta'], 2)
@@ -76,6 +77,7 @@ class TestNodeFunctions(unittest.TestCase):
 
         node.update_sensitivity()
 
+        self.assertEqual(node.node_value, -10)
         self.assertEqual(node[0]['cf_delta'], -1)
         self.assertEqual(node[1]['cf_delta'], 1)
         self.assertEqual(node[2]['cf_delta'], 2)
@@ -86,37 +88,41 @@ class TestNodeFunctions(unittest.TestCase):
         node = Node(node_type='E')
 
         # Create branches with all positive values
-        node.add_branch(cashflow = 0)
-        node.add_branch(cashflow = 1)
-        node.add_branch(cashflow = 2)
-        node.add_branch(cashflow = 3)
-        node.add_branch(cashflow = 4)
+        node.add_branch(cashflow = 0, probability=.1)
+        node.add_branch(cashflow = 1, probability=.2)
+        node.add_branch(cashflow = 2, probability=.3)
+        node.add_branch(cashflow = 3, probability=.3)
+        node.add_branch(cashflow = 4, probability=.1)
+        # expected value: 0+.2+.6+.9+.4=2.1
 
-        node.update_sensitivity()
+        node.update_sensitivity(parent_delta=2.2)
 
-        self.assertEqual(node[0]['cf_delta'], 4)
-        self.assertEqual(node[1]['cf_delta'], 3)
-        self.assertEqual(node[2]['cf_delta'], 2)
-        self.assertEqual(node[3]['cf_delta'], 1)
-        self.assertEqual(node[4]['cf_delta'], -1)
+        self.assertEqual(node.node_value, 2.1)
+        self.assertEqual(node[0]['cf_delta'], 1)
+        self.assertEqual(node[1]['cf_delta'], .5)
+        self.assertEqual(node[2]['cf_delta'], .333)
+        self.assertEqual(node[3]['cf_delta'], .333)
+        self.assertEqual(node[4]['cf_delta'], 1)
 
         # Reset for next test
         node = Node(node_type='E')
 
         # Create branches with all negative values
-        node.add_branch(cashflow = -10)
-        node.add_branch(cashflow = -11)
-        node.add_branch(cashflow = -12)
-        node.add_branch(cashflow = -13)
-        node.add_branch(cashflow = -14)
+        node.add_branch(cashflow = -10, probability=.2)
+        node.add_branch(cashflow = -11, probability=.1)
+        node.add_branch(cashflow = -12, probability=.3)
+        node.add_branch(cashflow = -13, probability=.3)
+        node.add_branch(cashflow = -14, probability=.1)
+        # expected value: -2-1.1-3.6-3.9-1.4= -12
 
-        node.update_sensitivity()
+        node.update_sensitivity(parent_delta= -4)
 
-        self.assertEqual(node[0]['cf_delta'], -1)
-        self.assertEqual(node[1]['cf_delta'], 1)
-        self.assertEqual(node[2]['cf_delta'], 2)
-        self.assertEqual(node[3]['cf_delta'], 3)
-        self.assertEqual(node[4]['cf_delta'], 4)
+        self.assertEqual(node.node_value, -12)
+        self.assertEqual(node[0]['cf_delta'], 40)
+        self.assertEqual(node[1]['cf_delta'], 80)
+        self.assertEqual(node[2]['cf_delta'], round(8/.3,3))
+        self.assertEqual(node[3]['cf_delta'], round(8/.3,3))
+        self.assertEqual(node[4]['cf_delta'], 80)
 
         # TODO Add test for add_branch
 

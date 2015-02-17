@@ -45,7 +45,8 @@ class Node:
     def add_branch(self, description=None, cashflow=0, probability=0.0):
         if description is None:
             description = self.node_type + str(len(self.branches))
-        branch = dict(description=description, cashflow=cashflow, backsolve=cashflow, probability=probability, child=None,
+        branch = dict(description=description, cashflow=cashflow, backsolve=cashflow, probability=probability,
+                      child=None,
                       t_value=0, t_probability=0, cf_delta=0)
         self.branches.append(branch)
 
@@ -68,7 +69,7 @@ class Node:
             best_cashflow = self.branches[best_branch]['cashflow']
 
             # run through the nodes, figure out the required change to each cashflow to change decision
-            deltas = [best_cashflow-b['cashflow'] for b in self.branches]
+            deltas = [best_cashflow - b['cashflow'] for b in self.branches]
             for index, branch in enumerate(self.branches):
                 branch['cf_delta'] = deltas[index]
 
@@ -89,12 +90,13 @@ class Node:
                 gap = parent_delta - self.node_value
                 deltas = [gap / b['probability'] for b in self.branches]
                 for index, branch in enumerate(self.branches):
-                    branch['cf_delta'] = round(deltas[index],3)
+                    branch['cf_delta'] = round(deltas[index], 3)
             pass
 
     @property
     def best_branch(self):
         # getting the node_value calculates and sets the private value for _best_branch
+        # noinspection PyStatementEffect
         self.node_value
         return self._best_branch
 
@@ -105,13 +107,13 @@ class Node:
         if self.node_type == 'E':
             self._best_branch = None
             p = [b['probability'] for b in self.branches]
-            if None in p or round(sum(p),2) != 1.0:
+            if None in p or round(sum(p), 2) != 1.0:
                 assert round(sum(p)) == 1.0
                 return None
             else:
                 for branch in self.branches:
                     if branch['child'] is None:
-                        branch['backsolve'] = branch['cashflow']*branch['probability']
+                        branch['backsolve'] = branch['cashflow'] * branch['probability']
 
                 a = [b['backsolve'] for b in self.branches]
                 if None in a:
@@ -165,7 +167,7 @@ class Node:
             self.branches[branch_number]['backsolve'] = value
 
     # def branch_number(self, branch_name):
-    #     a = [item['description'] for item in self.branches]
+    # a = [item['description'] for item in self.branches]
     #     return a.index(branch_name)
 
     def __getitem__(self, item):

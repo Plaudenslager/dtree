@@ -130,6 +130,19 @@ class TestNodeFunctions(unittest.TestCase):
 
         # TODO Add test for change_node
 
+    def test_child_nodes(self):
+        node = Node(node_type='D')
+        for index, cf in enumerate([0, 1, 2, 3, 4]):
+            node.add_branch(cashflow=cf)
+            if cf > 0:
+                node[index]['child'] = cf
+
+
+        list = node.child_list
+
+        self.assertEqual(len(list), 5)
+        self.assertEqual(list, [None, 1, 2, 3, 4])
+
 
 class TestTreeFunctions(unittest.TestCase):
     def setUp(self):
@@ -265,6 +278,10 @@ class TestTreeFunctions(unittest.TestCase):
         self.tree.set_node(0,'D', 3)
         for index, cf in enumerate([300, 600, 900]):
             self.tree[0][index]['cashflow'] = cf
+            child_node = self.tree.add_node(ParentID(0, index),'D', branches=3)
+            for index1, cf1 in enumerate([-100, -200, -300]):
+                self.tree[child_node][index1]['cashflow'] = cf1
+
         self.tree.solve()
 
         # calculate sensitivity

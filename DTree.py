@@ -68,7 +68,7 @@ class Node:
             best_branch = self.best_branch
             best_cashflow = self.branches[best_branch]['cashflow']
 
-            # run through the nodes, figure out the required change to each cashflow to change decision
+            # run through the branches, figure out the required change to each cashflow to change decision
             deltas = [best_cashflow - b['cashflow'] for b in self.branches]
             for index, branch in enumerate(self.branches):
                 branch['cf_delta'] = deltas[index]
@@ -77,6 +77,7 @@ class Node:
             self.branches[best_branch]['cf_delta'] = -min(deltas)
         else:
             if parent_delta is None:
+                # Sensitivity on probabilities needs to know the number you are aiming for
                 return
             else:
                 # find the cashflow change in each branch that will match the parent_delta
@@ -131,21 +132,6 @@ class Node:
                         self._best_branch = index
                         return round(max_value, 2)
 
-    # @property
-    # def t_value(self,branch_number):
-    # return self.branches[branch_number]['t_value']
-
-    # @t_value.setter
-    # def t_value(self,branch_number,value):
-    # self.branches[branch_number]['t_value'] = value
-
-    # @property
-    # def child(self, branch_number):
-    # return self.branches[branch_number]['child']
-
-    # @child.setter
-    # def child(self, branch_number, value):
-    # self.branches[branch_number]['child'] = value
 
     @property
     def parent(self):
@@ -154,6 +140,11 @@ class Node:
     @parent.setter
     def parent(self, parent_id):
         self.__parent_ID = parent_id
+
+    @property
+    def child_list(self):
+        a = [b['child'] for b in self.branches]
+        return a
 
     @property
     def width(self):
@@ -309,9 +300,9 @@ class Tree():
         """
 
         if self[node_id].width > 0:
+
             self[node_id].update_sensitivity()
 
-        # Build a list of nodes ranked by sensitivity
 
 
     def solve(self):

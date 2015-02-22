@@ -47,7 +47,7 @@ class Node:
             description = self.node_type + str(len(self.branches))
         branch = dict(description=description, cashflow=cashflow, backsolve=cashflow, probability=probability,
                       child=None,
-                      t_value=0, t_probability=0, cf_delta=0)
+                      t_value=0, t_probability=0, cf_delta=0, prob_delta=0)
         self.branches.append(branch)
 
     def del_branch(self, branch_number):
@@ -76,12 +76,6 @@ class Node:
             deltas.remove(0)
             self.branches[best_branch]['cf_delta'] = -min(deltas)
         else:
-            # TODO: calculate the sensitivity for event nodes
-            # Events are sensitive to both cashflow and to probability
-            # What we need to know is if changing one of those values results in meeting the cashflow requirements
-            # of the parent decision
-            # Will need to think about layered events
-            # So we need to know the sensitivity of the parent node, which we don't know in the node
             if parent_delta is None:
                 return
             else:
@@ -91,7 +85,12 @@ class Node:
                 deltas = [gap / b['probability'] for b in self.branches]
                 for index, branch in enumerate(self.branches):
                     branch['cf_delta'] = round(deltas[index], 3)
-            pass
+
+                # TODO: Calculate sensitivity for Probabilities
+                # Probability sensitivity is actually non-trivial
+                # If we change the probability of one branch, the others need to change too, so they all sum to 1,
+                # but we must assume that the cashflows are right.  So we must change each one by some fraction
+                # of the new P value, which we don't yet know.
 
     @property
     def best_branch(self):
@@ -300,7 +299,7 @@ class Tree():
         pass
 
     # Todo: Factor out depth-first, width-first searches for use with other functions, like solve & describe
-    # Todo: Allow trees to be saved to adn recovered from disk
+    # Todo: Allow trees to be saved to and recovered from disk
 
     def sensitivity_analysis(self, node_id=0, data=0):
         """
@@ -309,9 +308,11 @@ class Tree():
         calculate how much each backsolve must change to shift the upstream decision
         """
 
-        if self[node_id].width < 1:
-            return
-        self[node_id].update_sensitivity()
+        if self[node_id].width > 0:
+            self[node_id].update_sensitivity()
+
+        # Build a list of nodes ranked by sensitivity
+
 
     def solve(self):
         self.__forward_solve(0, 0)

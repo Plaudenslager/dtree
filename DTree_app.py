@@ -8,7 +8,7 @@ Create a sample tree:
 Should I get insurance on my phone?
 From MFG, it costs an extra $100, but covers all defects, and up to 2 accidents (which cost an extra $80 each)
 From carrier, it costs $7 / month (or $154 for 2 years), and covers all defects at $150 each
-If I don't, repairs cost $100, and replacement cost is 750.
+If I don't, repairs cost $100, and replacement cost is $750.
 
 '''
 

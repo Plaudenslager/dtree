@@ -260,6 +260,21 @@ class TestTreeFunctions(unittest.TestCase):
         self.assertEqual(self.tree.width(), 2 * depth + 1)
         self.assertEqual(self.tree.depth(), depth)
 
+    def test_sensitivity(self):
+        # build a moderate tree
+        self.tree.set_node(0,'D', 3)
+        for index, cf in enumerate([300, 600, 900]):
+            self.tree[0][index]['cashflow'] = cf
+        self.tree.solve()
+
+        # calculate sensitivity
+        self.tree.sensitivity_analysis()
+
+        # see if the calculations are correct
+        self.assertEqual(self.tree[0][0]['cf_delta'], 600)
+        self.assertEqual(self.tree[0][1]['cf_delta'], 300)
+        self.assertEqual(self.tree[0][2]['cf_delta'], -300)
+
 
 if __name__ == '__main__':
     unittest.main()

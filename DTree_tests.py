@@ -124,12 +124,6 @@ class TestNodeFunctions(unittest.TestCase):
         self.assertEqual(node[3]['cf_delta'], round(8 / .3, 3))
         self.assertEqual(node[4]['cf_delta'], 80)
 
-        # TODO Add test for add_branch
-
-        # TODO Add test for del_branch
-
-        # TODO Add test for change_node
-
     def test_child_nodes(self):
         node = Node(node_type='D')
         for index, cf in enumerate([0, 1, 2, 3, 4]):
@@ -143,6 +137,12 @@ class TestNodeFunctions(unittest.TestCase):
         self.assertEqual(len(list), 5)
         self.assertEqual(list, [None, 1, 2, 3, 4])
 
+
+    # TODO Add test for add_branch
+
+    # TODO Add test for del_branch
+
+    # TODO Add test for change_node
 
 class TestTreeFunctions(unittest.TestCase):
     def setUp(self):

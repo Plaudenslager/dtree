@@ -276,6 +276,14 @@ class Tree():
                         self[branch['child']].node_type, branch['child'])
                     self.display(branch['child'], level + 1, depth)
 
+    def show_sensitivity(self, node_id=0):
+        # returns a list of nodes and their sensitivity percentage, sorted by sensitivity
+        for c in self[node_id].child_list:
+            if c is not None:
+                self.show_sensitivity(node_id = c)
+
+
+
     def depth(self, node_id=0):
         max_depth = 1
         if self[node_id].width > 0:
@@ -300,8 +308,11 @@ class Tree():
         """
 
         if self[node_id].width > 0:
+            for c in self[node_id].child_list:
+                if c is not None:
+                    self.sensitivity_analysis(node_id=c)
 
-            self[node_id].update_sensitivity()
+                self[node_id].update_sensitivity()
 
 
 

@@ -307,12 +307,12 @@ class Tree():
         calculate how much each backsolve must change to shift the upstream decision
         """
 
-        if self[node_id].width > 0:
-            for c in self[node_id].child_list:
-                if c is not None:
-                    self.sensitivity_analysis(node_id=c)
-
-                self[node_id].update_sensitivity()
+        self.sensitivity_table = dict()
+        for n_id, node in self.nodes.iteritems():
+            node.update_sensitivity()
+            for b_id, branch in enumerate(node.branches):
+                unique_branch = ParentID(n_id,b_id)
+                self.sensitivity_table[unique_branch] = branch['cf_delta'] / branch['cashflow']
 
 
 

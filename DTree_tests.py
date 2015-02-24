@@ -292,6 +292,21 @@ class TestTreeFunctions(unittest.TestCase):
         self.assertEqual(self.tree[0][1]['cf_delta'], 300)
         self.assertEqual(self.tree[0][2]['cf_delta'], -300)
 
+        # see if the table is correct
+        table = {ParentID(0,0): 600, ParentID(0,1): 300, ParentID(0,2): -300,
+                 ParentID(1,0): -100, ParentID(1,1): 100, ParentID(1,2): 200,
+                 ParentID(2,0): -100, ParentID(2,1): 100, ParentID(2,2): 200,
+                 ParentID(3,0): -100, ParentID(3,1): 100, ParentID(3,2): 200}
+
+        sensitivity_table = self.tree.sensitivity_table
+
+        # TODO: different objects constructed from same signature are not equivalent keys in a dictionary
+        self.assertEqual(len(sensitivity_table), len(table))
+        self.assertIn(ParentID(0,0),table)
+
+        for k in table.keys():
+            self.assertEqual(sensitivity_table[k], table[k])
+
 
 if __name__ == '__main__':
     unittest.main()

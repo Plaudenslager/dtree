@@ -1,4 +1,5 @@
 __author__ = 'peter'
+
 import pickle
 from GUI import Application, ScrollableView, Document, Window, Cursor, rgb
 from GUI.Geometry import pt_in_rect, offset_rect, rects_intersect
@@ -69,3 +70,51 @@ class DTreeDoc(Document):
     def write_contents(self, file):
         # Gets run on a File:Save or File:SaveAs command (or method call)
         pickle.dump(self.tree, file)
+
+    def walk_tree(self, node_id=0, level=0, depth=0):
+        # Walk the tree (depth first) and return node details
+        if node_id == 0:
+            # Root node - update calculations, print root node details,
+            self.solve()
+            print "%s:%s bs: $%s" % (self[node_id].node_type, node_id, self[node_id].node_value)
+            depth = self.depth(0)
+
+    # TODO: (P0) Add DTree editing functions here, like Edit Node
+
+class BlobView(ScrollableView):
+    # Defines the view; this one handles two functions:
+    # Drawing and user input
+    # It also inherits the capabilities of the built-in ScrollableView
+
+    def draw(self, canvas, update_rect):
+        # Define how to redraw everything within update_rect
+
+        canvas.fillcolor = red
+        canvas.pencolor = black
+        # Walk the tree (depth first) and print node details in tree format
+        for node in self.model.tree:
+
+class NodeImage:
+
+    def __init__(self, x, y):
+        self.size = 40
+        self.rect = (x - self.size/2, y - self.size/2, x + self.size/2, y + self.size/2)
+
+    def contains(self, x, y):
+        return pt_in_rect((x, y), self.rect)
+
+    def intersects(self, rect):
+        return rects_intersect(rect, self.rect)
+
+    def move(self, dx, dy):
+        self.rect = offset_rect(self.rect, (dx, dy))
+
+    def draw(self, canvas):
+        l, t, r, b = self.rect
+        canvas.newpath()
+        canvas.moveto(l, t)
+        canvas.lineto(r, t)
+        canvas.lineto(r, b)
+        canvas.lineto(l, b)
+        canvas.closepath()
+        canvas.fill_stroke()

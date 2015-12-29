@@ -42,6 +42,17 @@ class Node:
         self.__parent_ID = None
         self._best_branch = None
 
+        ''' row and column are for use with GUIs that display the tree;
+            this saves the GUI walking the tree every for every screen refresh.
+            They are calculated in the Tree function, typically during a forward solve
+        '''
+
+        # Root node is row 0.  Each additional branch (width) requires its own row.
+        self.row = None
+
+        # Root node is column 0.  Each additional node in depth requires its own column.
+        self.column = None
+
     def add_branch(self, description=None, cashflow=0, probability=0.0):
         if description is None:
             description = self.node_type + str(len(self.branches))
@@ -80,6 +91,11 @@ class Node:
 
     @property
     def node_value(self):
+        # Calculate the value of the downstream cash-flows (not including any for choosing this node)
+        # Works down the tree to update all values
+        # Uses expected value for events
+        # Uses the cash-flow from the branch with the highest downstream cash-flow
+
         if self.width == 0:
             return 0
         if self.node_type == 'E':
@@ -349,11 +365,11 @@ class Tree():
             else:
                 branch['t_probability'] = p
 
-    def __forward_solve(self, node_id=0, cashflow=0):
+    def __forward_solve(self, node_id=0, upstream_cashflow=0):
         """
 
         :param node_id: the node to be calculated
-        :param cashflow: cashflows accumulated from parent node
+        :param upstream_cashflow: cashflows accumulated from parent node
         :return: backsolve value
 
         forward solve adds up all the cashflows along a particular path from root to end leaf
@@ -366,22 +382,23 @@ class Tree():
         to the caller (usually the previous instance of this function)
         """
         if self[node_id].width > 0:
-            for index, branch in enumerate(self[node_id].branches):
+            # Not a terminal node; iterate through the branches
+            for branch_number, branch in enumerate(self[node_id].branches):
                 # forward solve is the sum of all previous cashflows plus this cashflow
-                cf = cashflow + branch['cashflow']
+                cf = upstream_cashflow + branch['cashflow']
                 if branch['child'] is not None:
                     downstream_investments = self.__forward_solve(branch['child'], cf)
                     if downstream_investments is None:
-                        backsolve = None
+                        total_branch_cashflow = None
                     else:
-                        backsolve = branch['cashflow'] + downstream_investments
+                        total_branch_cashflow = branch['cashflow'] + downstream_investments
                 else:
                     # Calculation for a leaf node
                     # forward solve is the sum of all previous cashflows
                     branch['t_value'] = cf
-                    backsolve = branch['cashflow']
+                    total_branch_cashflow = branch['cashflow']
 
-                self[node_id].update_backsolve(index, backsolve)
+                self[node_id].update_backsolve(branch_number, total_branch_cashflow)
 
             # Need to return the backsolve value
             return self[node_id].node_value

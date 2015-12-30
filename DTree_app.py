@@ -6,9 +6,9 @@ from DTree import *
 Create a sample tree:
 
 Should I get insurance on my phone?
-From MFG, it costs an extra $100, but covers all defects, and up to 2 accidents (which cost an extra $80 each)
+From MFG, it costs an extra $130, but covers all defects, and up to 2 accidents (which cost an extra $100 each)
 From carrier, it costs $7 / month (or $154 for 2 years), and covers all defects at $150 each
-If I don't, repairs cost $100, and replacement cost is 750.
+If I don't, repairs cost $150, and replacement cost is 750.
 
 '''
 
@@ -23,7 +23,7 @@ tree.display()
 print "\nSet the description and cashflow for the branches"
 # specify a node and branch by tree[node_id][branch_number_starting_with_0]
 tree[0][0]['description'] = 'MFG insurance'
-tree[0][0]['cashflow'] = -100
+tree[0][0]['cashflow'] = -130
 tree[0][1]['description'] = 'Carrier insurance'
 tree[0][1]['cashflow'] = -154
 tree[0][2]['description'] = 'skip insurance'
@@ -46,10 +46,10 @@ tree[nodeID][1]['description'] = 'hardware defect'
 tree[nodeID][1]['cashflow'] = 0
 tree[nodeID][1]['probability'] = .25
 tree[nodeID][2]['description'] = 'one accident'
-tree[nodeID][2]['cashflow'] = -80
+tree[nodeID][2]['cashflow'] = -150
 tree[nodeID][2]['probability'] = .25
 tree[nodeID][3]['description'] = 'two accidents'
-tree[nodeID][3]['cashflow'] = -160
+tree[nodeID][3]['cashflow'] = -300
 tree[nodeID][3]['probability'] = .25
 tree.display()
 
@@ -68,13 +68,13 @@ tree[nodeID][0]['description'] = 'no problems'
 tree[nodeID][0]['cashflow'] = 0
 tree[nodeID][0]['probability'] = .25
 tree[nodeID][1]['description'] = 'hardware defect'
-tree[nodeID][1]['cashflow'] = -100
+tree[nodeID][1]['cashflow'] = -150
 tree[nodeID][1]['probability'] = .25
 tree[nodeID][2]['description'] = 'one accident'
-tree[nodeID][2]['cashflow'] = -100
+tree[nodeID][2]['cashflow'] = -150
 tree[nodeID][2]['probability'] = .25
 tree[nodeID][3]['description'] = 'two accidents'
-tree[nodeID][3]['cashflow'] = -200
+tree[nodeID][3]['cashflow'] = -300
 tree[nodeID][3]['probability'] = .25
 tree.display()
 
@@ -93,17 +93,17 @@ tree[nodeID][0]['description'] = 'no problems'
 tree[nodeID][0]['cashflow'] = 0
 tree[nodeID][0]['probability'] = .25
 tree[nodeID][1]['description'] = 'hardware defect'
-tree[nodeID][1]['cashflow'] = -100
+tree[nodeID][1]['cashflow'] = -190
 tree[nodeID][1]['probability'] = .25
 tree[nodeID][2]['description'] = 'one accident'
-tree[nodeID][2]['cashflow'] = -100
+tree[nodeID][2]['cashflow'] = -150
 tree[nodeID][2]['probability'] = .25
 tree[nodeID][3]['description'] = 'two accidents'
-tree[nodeID][3]['cashflow'] = -200
+tree[nodeID][3]['cashflow'] = -300
 tree[nodeID][3]['probability'] = .25
 tree.display()
 
-print "\nWithout insurance, only minor accidents can be fixed for $100"
+print "\nWithout insurance, only minor accidents can be fixed for $150"
 print "Add events to one- and two- accident branches to consider odds of major or minor accidents"
 # get the right starting node
 nodeID = tree[0][2]['child']
@@ -121,7 +121,7 @@ tree[nodeID][0]['description'] = 'minor accident'
 tree[nodeID][0]['cashflow'] = 0
 tree[nodeID][0]['probability'] = .70
 tree[nodeID][1]['description'] = 'major accident'
-tree[nodeID][1]['cashflow'] = -650
+tree[nodeID][1]['cashflow'] = -600
 tree[nodeID][1]['probability'] = .30
 
 print "Do it again for the two accident branch"
@@ -138,18 +138,18 @@ tree[nodeID][0]['description'] = 'minor accident'
 tree[nodeID][0]['cashflow'] = 0
 tree[nodeID][0]['probability'] = .70
 tree[nodeID][1]['description'] = 'major accident'
-tree[nodeID][1]['cashflow'] = -1300
+tree[nodeID][1]['cashflow'] = -1200
 tree[nodeID][1]['probability'] = .30
 
 print "\nThis should be our final tree"
 tree.display()
 
 print "\nHow to read the tree:"
-print "* The backsolve (bs:) value on the root node (D:0 ) tells us the average amount we will spend on repairs & insurance ($160)"
-print "* Our decision is to buy the insurance, because the backsolve for that is higher than for carrier or skip (-160 vs -254 or -246)"
-print "* With insurance, the expected cost of accidents is -60, the sum of all the bs values across all the outcomes"
-print "* So we add -60 to the cost of the insurance to find a total cost of -160"
-print "*\n With carrier insurance, the expected cost of accidents is -254."
+print "* The backsolve (bs:) value on the root node (D:0 ) tells us the average amount we will spend on repairs & insurance ($242.5)"
+print "* Our decision is to buy the insurance, because the backsolve for that is higher than for carrier or skip (-242.5 vs -304.0 or -295.0)"
+print "* With insurance, the expected cost of accidents is -112.5, the sum of all the bs values across all the outcomes"
+print "* So we add -112.5 to the cost of the insurance to find a total cost of -242.5"
+print "\n* With carrier insurance, the expected cost of accidents is -254."
 print "\n* Without insurance, the expected cost of accidents is -246; although the probabilities are the same, the costs are higher"
 print "\n* Also notice the terminal values at the end of the arrows"
 print "* They help indicate the worst-case scenarios, e.g. with MFG insurance, max expense is -260; without could be -1500."

@@ -223,7 +223,7 @@ class TestTreeFunctions(unittest.TestCase):
         self.assertEqual(self.tree[node_id][3]['t_probability'], .5)
 
     def test_wide(self):
-        # Verify that a very wide tree can be created
+        # Verify that a very wide tree (225 leaf nodes) can be created
         root_width = 15
         child_width = 15
 

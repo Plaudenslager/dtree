@@ -45,19 +45,17 @@ class Node:
     def add_branch(self, description=None, cashflow=0, probability=0.0):
         if description is None:
             description = self.node_type + str(len(self.branches))
-<<<<<<< HEAD
-        branch = dict(description=description, cashflow=cashflow, backsolve=cashflow, probability=probability, child=None,
-                      t_value=0, t_probability=0, cf_delta=0)
-=======
+
         branch = dict(description=description,
                       cashflow=cashflow,
-                      backsolve=0,
+                      backsolve=cashflow,
                       probability=probability,
                       child=None,
                       t_value=0,
-                      t_probability=0
+                      t_probability=0,
+                      cf_delta=0
                       )
->>>>>>> master
+
         self.branches.append(branch)
 
     def del_branch(self, branch_number):
@@ -83,7 +81,9 @@ class Node:
             for index, branch in enumerate(self.branches):
                 branch['cf_delta'] = deltas[index]
 
+            # remove the value equal to 0, which is from the current best branch
             deltas.remove(0)
+            # find the next smallest delta, store it in the branch.
             self.branches[best_branch]['cf_delta'] = -min(deltas)
         else:
             # TODO: calculate the sensitivity for event nodes
@@ -146,25 +146,6 @@ class Node:
                         self._best_branch = index
                         return round(max_value, 2)
 
-<<<<<<< HEAD
-    # @property
-    # def t_value(self,branch_number):
-    # return self.branches[branch_number]['t_value']
-
-    # @t_value.setter
-    # def t_value(self,branch_number,value):
-    # self.branches[branch_number]['t_value'] = value
-
-    # @property
-    # def child(self, branch_number):
-    # return self.branches[branch_number]['child']
-
-    # @child.setter
-    # def child(self, branch_number, value):
-    # self.branches[branch_number]['child'] = value
-
-=======
->>>>>>> master
     @property
     def parent(self):
         return self.__parent_ID

@@ -180,37 +180,6 @@ class TestTreeFunctions(unittest.TestCase):
         self.assertEqual(self.tree.width(), 2 * depth + 1)
         self.assertEqual(self.tree.depth(), depth)
 
-    def test_GUI_positions_wide(self):
-        # Verify that row and column numbers are calculated correctly
-        # As child nodes are added, they force younger sibling branches down
-        root_width = 4
-        child_width = 2
-
-        self.tree.set_node(0, 'D', root_width)
-        node_id = 0
-
-        # Verify that root node gets correct row and column numbers
-        self.assertEqual(self.tree[node_id].row, 0)
-        self.assertEqual(self.tree[node_id].column, 0)
-
-        # Create <width> nodes
-        for branch_number in range(0, root_width):
-            parent = ParentID(0, branch_number)
-
-            # Alternate node_types; shouldn't matter, so test lots of conditions
-            if int(node_id) % 2 > 0:
-                node_type = 'E'
-            else:
-                node_type = 'D'
-
-            # Create a new node
-            node_id = self.tree.add_node(parent, node_type, branches=child_width)
-
-            # Verify the correct row and column number
-            self.assertEqual(self.tree[node_id].column, 1)
-            self.assertEqual(self.tree[node_id].row, branch_number)
-
-
 
 if __name__ == '__main__':
     unittest.main()

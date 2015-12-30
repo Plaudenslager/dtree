@@ -42,19 +42,6 @@ class Node:
         self.__parent_ID = None
         self._best_branch = None
 
-        ''' row and column are for use with GUIs that display the tree;
-            this saves the GUI walking the tree every for every screen refresh.
-            They are calculated in the Tree function, typically during a forward solve.
-            Root node is row 0.  Each additional branch (width) requires its own row.
-            Root node is column 0.  Each additional node in depth requires its own column.
-        '''
-        if guid == 0:
-            self.row = 0
-            self.column = 0
-        else:
-            self.row = None
-            self.column = None
-
     def add_branch(self, description=None, cashflow=0, probability=0.0):
         if description is None:
             description = self.node_type + str(len(self.branches))
@@ -237,11 +224,6 @@ class Tree():
         for b in range(0, branches):
             p = 1.0 / branches
             node.add_branch(description=None, cashflow=0, probability=p)
-
-        # column number is one more than parent column number
-        node.column = self[parent_id.node_id].column + 1
-        # row number is parent node row number plus branch number
-        node.row = self[parent_id.node_id].row + parent_id.branch_number
 
         self.solve()
         return node.ID

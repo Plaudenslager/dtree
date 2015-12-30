@@ -44,20 +44,28 @@ class Node:
 
         ''' row and column are for use with GUIs that display the tree;
             this saves the GUI walking the tree every for every screen refresh.
-            They are calculated in the Tree function, typically during a forward solve
+            They are calculated in the Tree function, typically during a forward solve.
+            Root node is row 0.  Each additional branch (width) requires its own row.
+            Root node is column 0.  Each additional node in depth requires its own column.
         '''
-
-        # Root node is row 0.  Each additional branch (width) requires its own row.
-        self.row = None
-
-        # Root node is column 0.  Each additional node in depth requires its own column.
-        self.column = None
+        if guid == 0:
+            self.row = 0
+            self.column = 0
+        else:
+            self.row = None
+            self.column = None
 
     def add_branch(self, description=None, cashflow=0, probability=0.0):
         if description is None:
             description = self.node_type + str(len(self.branches))
-        branch = dict(description=description, cashflow=cashflow, backsolve=0, probability=probability, child=None,
-                      t_value=0, t_probability=0)
+        branch = dict(description=description,
+                      cashflow=cashflow,
+                      backsolve=0,
+                      probability=probability,
+                      child=None,
+                      t_value=0,
+                      t_probability=0
+                      )
         self.branches.append(branch)
 
     def del_branch(self, branch_number):
@@ -121,22 +129,6 @@ class Node:
                         self._best_branch = index
                         return round(max_value, 2)
 
-    # @property
-    # def t_value(self,branch_number):
-    # return self.branches[branch_number]['t_value']
-
-    # @t_value.setter
-    # def t_value(self,branch_number,value):
-    # self.branches[branch_number]['t_value'] = value
-
-    # @property
-    # def child(self, branch_number):
-    # return self.branches[branch_number]['child']
-
-    # @child.setter
-    # def child(self, branch_number, value):
-    #     self.branches[branch_number]['child'] = value
-
     @property
     def parent(self):
         return self.__parent_ID
@@ -150,14 +142,18 @@ class Node:
         return len(self.branches)
 
     def update_backsolve(self, branch_number, value):
+        ''' Set the backsolve value for the branch.
+        :param branch_number: Required 0 based selector for which branch of this node.
+        :param value: Required Total of all downstream investments, including cashflow for this branch.
+        :return: None - properties of the node are updated
+        '''
         if value is not None and self.node_type == 'E':
+            # If the value is None, this means a problem downstream; we propagate it up to highlight the error.
             self.branches[branch_number]['backsolve'] = value * self.branches[branch_number]['probability']
+            # Backsolve value of an event branch is the Expected Value of downstream cashflows
         else:
             self.branches[branch_number]['backsolve'] = value
-
-    # def branch_number(self, branch_name):
-    #     a = [item['description'] for item in self.branches]
-    #     return a.index(branch_name)
+            # Backsolve value of a decision branch is the total of downstream cashflows
 
     def __getitem__(self, item):
         return self.branches[item]
@@ -241,6 +237,12 @@ class Tree():
         for b in range(0, branches):
             p = 1.0 / branches
             node.add_branch(description=None, cashflow=0, probability=p)
+
+        # column number is one more than parent column number
+        node.column = self[parent_id.node_id].column + 1
+        # row number is parent node row number plus branch number
+        node.row = self[parent_id.node_id].row + parent_id.branch_number
+
         self.solve()
         return node.ID
 
@@ -387,18 +389,21 @@ class Tree():
                 # forward solve is the sum of all previous cashflows plus this cashflow
                 cf = upstream_cashflow + branch['cashflow']
                 if branch['child'] is not None:
+                    # Call forward_solve again for the child node, pass forward the cashflow up to this branch.
                     downstream_investments = self.__forward_solve(branch['child'], cf)
                     if downstream_investments is None:
-                        total_branch_cashflow = None
+                        # This means something isn't right downstream, e.g. probabilities don't sum to 1.
+                        # Propagating it back up the line makes the error very obvious, so it will get fixed.
+                        backsolve_cashflow = None
                     else:
-                        total_branch_cashflow = branch['cashflow'] + downstream_investments
+                        backsolve_cashflow = branch['cashflow'] + downstream_investments
                 else:
-                    # Calculation for a leaf node
+                    # Calculation for a leaf node; there are no downstream investments
                     # forward solve is the sum of all previous cashflows
                     branch['t_value'] = cf
-                    total_branch_cashflow = branch['cashflow']
+                    backsolve_cashflow = branch['cashflow']
 
-                self[node_id].update_backsolve(branch_number, total_branch_cashflow)
+                self[node_id].update_backsolve(branch_number, backsolve_cashflow)
 
             # Need to return the backsolve value
             return self[node_id].node_value
